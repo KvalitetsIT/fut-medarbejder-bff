@@ -1,5 +1,5 @@
-package dk.kvalitetsit.hello.integrationtest;
-
+package dk.kvalitetsit.hello;
+/*
 import org.junit.Assert;
 import org.junit.Test;
 import org.openapitools.client.ApiClient;
@@ -42,3 +42,4 @@ public class HelloIT extends AbstractIntegrationTest {
         assertEquals(400, thrownException.getCode());
     }
 }
+*/

@@ -3,14 +3,16 @@ package dk.kvalitetsit.hello.dao;
 import dk.kvalitetsit.hello.dao.entity.HelloEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.DataClassRowMapper;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+//import org.springframework.jdbc.core.DataClassRowMapper;
+//import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 
-public class HelloDaoImpl implements HelloDao {
+public class HelloDaoImpl {
+
+    /*
     private static final Logger logger = LoggerFactory.getLogger(HelloDaoImpl.class);
     private final NamedParameterJdbcTemplate template;
 
@@ -36,4 +38,6 @@ public class HelloDaoImpl implements HelloDao {
 
         return template.query(sql, new DataClassRowMapper<>(HelloEntity.class));
     }
+
+    */
 }

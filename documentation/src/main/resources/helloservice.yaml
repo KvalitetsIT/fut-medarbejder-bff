@@ -47,6 +47,103 @@ paths:
               schema:
                 $ref: '#/components/schemas/helloResponse'
 
+  /v1/patients:
+    post:
+      tags:
+        - createPatient
+      summary: Create patient
+      description: Create a new patient
+      requestBody:
+        description: A new patient.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createPatient'
+      responses:
+        '201':
+          description: The patient is created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patient'
+        '401':
+          $ref: '#/components/responses/401'
+    get:
+      tags:
+        - patients
+      summary: get patients
+      description: Request a list of patients.
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patients'
+
+  /v1/patients/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: the uuid corresponding to the patient of interest
+    get:
+      tags:
+        - patient
+      summary: get patient
+      description: Request a patient by id.
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patient'
+    delete:
+      tags:
+        - patient
+      summary: delete patient
+      description: Delete a patient by id.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: the uuid corresponding to the patient that is to be deleted
+      responses:
+        '200':
+          description: Ok
+    put:
+      tags:
+        - patient
+      summary: update patient
+      description: Update a patient by id.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: the uuid corresponding to the patient that is to be deleted
+      requestBody:
+        description: A patient
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createPatient'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patient'
+
 components:
   responses:
     '400':
@@ -73,6 +170,41 @@ components:
         i_can_be_null:
           type: string
           nullable: true
+    patients:
+      type: array
+      items:
+        $ref: '#/components/schemas/patient'
+
+    patient:
+      type: object
+      properties:
+        uuid:
+          description: an uuid identifying the patient
+          type: string
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        firstName:
+          description: the patients firstname
+          type: string
+          example: "Joe"
+        lastName:
+          description: the patients lastname
+          type: string
+          example: "Dow"
+
+    createPatient:
+      type: object
+      properties:
+        firstName:
+          description: the patients firstname
+          type: string
+          example: "Joe"
+        lastName:
+          description: the patients lastname
+          type: string
+          example: "Dow"
+
+
+
 
     helloRequest:
       type: object

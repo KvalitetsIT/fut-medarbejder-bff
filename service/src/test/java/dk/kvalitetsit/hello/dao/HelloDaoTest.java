@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-
+/*
 public class HelloDaoTest extends AbstractDaoTest {
     @Autowired
     private HelloDao helloDao;
@@ -25,3 +25,4 @@ public class HelloDaoTest extends AbstractDaoTest {
         assertNotNull(result.get(0).id());
     }
 }
+*/

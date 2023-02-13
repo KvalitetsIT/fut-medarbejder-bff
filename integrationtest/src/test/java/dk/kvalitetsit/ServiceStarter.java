@@ -1,7 +1,6 @@
-package dk.kvalitetsit.hello.integrationtest;
+package dk.kvalitetsit;
 
 import com.github.dockerjava.api.model.VolumesFrom;
-import dk.kvalitetsit.hello.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -31,7 +30,7 @@ public class ServiceStarter {
         System.setProperty("JDBC.URL", jdbcUrl);
         System.setProperty("JDBC.USER", "hellouser");
         System.setProperty("JDBC.PASS", "secret1234");
-
+        //System.setProperty("ALLOWED_ORIGINS", "http://localhost:3000");
         SpringApplication.run(Application.class);
     }
 

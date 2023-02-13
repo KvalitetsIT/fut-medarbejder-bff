@@ -12,9 +12,11 @@ import javax.sql.DataSource;
 @EnableAutoConfiguration
 public class TestConfiguration {
     // Configure beans used for test
-
+/*
     @Bean
     public HelloDao helloDao(DataSource dataSource) {
         return new HelloDaoImpl(dataSource);
     }
+ */
 }
+

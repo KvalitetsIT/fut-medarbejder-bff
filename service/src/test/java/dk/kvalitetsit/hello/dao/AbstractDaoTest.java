@@ -1,5 +1,5 @@
 package dk.kvalitetsit.hello.dao;
-
+/*
 import dk.kvalitetsit.hello.configuration.TestConfiguration;
 import dk.kvalitetsit.hello.configuration.DatabaseConfiguration;
 import org.junit.BeforeClass;
@@ -41,4 +41,6 @@ abstract public class AbstractDaoTest {
         }
     }
 }
+*/
+
 

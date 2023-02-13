@@ -5,15 +5,17 @@ import dk.kvalitetsit.hello.dao.HelloDaoImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+//import org.springframework.jdbc.datasource.DriverManagerDataSource;
+//import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 
 @Configuration
-@EnableTransactionManagement
+//@EnableTransactionManagement
 public class DatabaseConfiguration {
+    /*
     @Bean
+
     public HelloDao helloDao(DataSource dataSource) {
         return new HelloDaoImpl(dataSource);
     }
@@ -27,4 +29,6 @@ public class DatabaseConfiguration {
 
         return dataSource;
     }
+     */
+
 }
