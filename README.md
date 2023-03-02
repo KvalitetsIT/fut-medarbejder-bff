@@ -1,5 +1,5 @@
-![Build Status](https://github.com/KvalitetsIT/kithugs/workflows/CICD/badge.svg)
-# kithugs
+![Build Status](https://github.com/KvalitetsIT/fut-medarbejder-bff/workflows/CICD/badge.svg)
+# fut-medarbejder-bff
 
 Template repository showing how to be a good Java Spring Boot citizen in a k8s cluster.
 
