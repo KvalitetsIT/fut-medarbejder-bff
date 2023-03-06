@@ -50,7 +50,7 @@ paths:
   /v1/patients:
     post:
       tags:
-        - createPatient
+        - patients
       summary: Create patient
       description: Create a new patient
       requestBody:
@@ -92,7 +92,7 @@ paths:
         description: the uuid corresponding to the patient of interest
     get:
       tags:
-        - patient
+        - patients
       summary: get patient
       description: Request a patient by id.
       responses:
@@ -102,47 +102,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/patient'
-    delete:
-      tags:
-        - patient
-      summary: delete patient
-      description: Delete a patient by id.
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: the uuid corresponding to the patient that is to be deleted
-      responses:
-        '200':
-          description: Ok
-    put:
-      tags:
-        - patient
-      summary: update patient
-      description: Update a patient by id.
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: the uuid corresponding to the patient that is to be deleted
-      requestBody:
-        description: A patient
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/createPatient'
-      responses:
-        '200':
-          description: Ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/patient'
+#    delete:
+#      tags:
+#        - patients
+#      summary: delete patient
+#      description: Delete a patient by id.
+#      parameters:
+#        - in: path
+#          name: id
+#          required: true
+#          schema:
+#            type: string
+#          description: the uuid corresponding to the patient that is to be deleted
+#      responses:
+#        '200':
+#          description: Ok
+#    put:
+#      tags:
+#        - patients
+#      summary: update patient
+#      description: Update a patient by id.
+#      parameters:
+#        - in: path
+#          name: id
+#          required: true
+#          schema:
+#            type: string
+#          description: the uuid corresponding to the patient that is to be deleted
+#      requestBody:
+#        description: A patient
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              $ref: '#/components/schemas/createPatient'
+#      responses:
+#        '200':
+#          description: Ok
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/patient'
 
 components:
   responses:
@@ -170,6 +170,7 @@ components:
         i_can_be_null:
           type: string
           nullable: true
+
     patients:
       type: array
       items:
@@ -190,6 +191,9 @@ components:
           description: the patients lastname
           type: string
           example: "Dow"
+        cpr:
+          description: CPR
+          type: string
 
     createPatient:
       type: object

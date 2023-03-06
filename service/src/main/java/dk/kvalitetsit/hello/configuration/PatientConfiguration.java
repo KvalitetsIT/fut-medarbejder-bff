@@ -1,9 +1,14 @@
-package dk.kvalitetsit.patients;
+package dk.kvalitetsit.hello.configuration;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+import dk.kvalitetsit.hello.service.AuthService;
+import dk.kvalitetsit.hello.service.PatientService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -17,11 +22,15 @@ import java.io.IOException;
 import java.util.List;
 
 @Configuration
-public class PatientConfig implements WebMvcConfigurer {
+public class PatientConfiguration implements WebMvcConfigurer {
+
+    @Value("${patient.service.url}")
+    private String patientServiceUrl;
 
     @Bean
-    public PatientService patientService() {
-      return new PatientServiceImpl();
+    public PatientService patientService(@Autowired AuthService authService) {
+        IGenericClient fhirClient = FhirContext.forR4().newRestfulGenericClient(patientServiceUrl);
+        return new PatientService(fhirClient, authService);
     }
 
     @Value("${ALLOWED_ORIGINS:http://localhost:3000}")
@@ -48,7 +57,7 @@ public class PatientConfig implements WebMvcConfigurer {
         @Bean
         public Filter loggerFilter() {
             return new Filter() {
-                private static final Logger logger = LoggerFactory.getLogger(PatientConfig.class);
+                private static final Logger logger = LoggerFactory.getLogger(PatientConfiguration.class);
                 @Override
                 public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
                     HttpServletRequest httpRequest = (HttpServletRequest) request;
