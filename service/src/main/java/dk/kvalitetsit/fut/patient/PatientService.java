@@ -1,16 +1,16 @@
 package dk.kvalitetsit.fut.patient;
 
-import org.openapitools.model.CreatePatient;
-import org.openapitools.model.Patient;
+import org.openapitools.model.CreatePatientDto;
+import org.openapitools.model.PatientDto;
 
 import java.util.List;
 
 public interface PatientService {
-    Patient getPatient(String uuid) throws Exception;
+    PatientDto getPatient(String uuid) throws Exception;
 
-    List<Patient> getPatients();
+    List<PatientDto> getPatients();
 
     void removePatient(String uuid) throws Exception;
 
-    Patient createPatient(CreatePatient patient);
+    PatientDto createPatient(CreatePatientDto patient);
 }

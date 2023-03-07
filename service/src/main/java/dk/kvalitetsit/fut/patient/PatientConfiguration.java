@@ -27,9 +27,9 @@ public class PatientConfiguration implements WebMvcConfigurer {
     private String patientServiceUrl;
 
     @Bean
-    public PatientServiceImpl patientService(@Autowired AuthService authService) {
+    public PatientServiceImpl patientService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
         IGenericClient fhirClient = FhirContext.forR4().newRestfulGenericClient(patientServiceUrl);
-        return new PatientServiceImpl(fhirClient, authService);
+        return new PatientServiceImpl(fhirContext, patientServiceUrl, authService);
     }
 
     @Value("${ALLOWED_ORIGINS:http://localhost:3000}")

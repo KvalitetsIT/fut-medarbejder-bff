@@ -21,14 +21,14 @@ public class HelloController implements KithugsApi {
     }
 
     @Override
-    public ResponseEntity<org.openapitools.model.HelloResponse> v1HelloPost(org.openapitools.model.HelloRequest helloRequest) {
+    public ResponseEntity<org.openapitools.model.HelloResponseDto> v1HelloPost(org.openapitools.model.HelloRequestDto helloRequest) {
         logger.debug("Enter POST hello.");
 
         var serviceInput = new HelloServiceInput(helloRequest.getName());
 
         var serviceResponse = helloService.helloServiceBusinessLogic(serviceInput);
 
-        var helloResponse = new org.openapitools.model.HelloResponse();
+        var helloResponse = new org.openapitools.model.HelloResponseDto();
         helloResponse.setName(serviceResponse.name());
         helloResponse.setNow(serviceResponse.now().toOffsetDateTime());
 
