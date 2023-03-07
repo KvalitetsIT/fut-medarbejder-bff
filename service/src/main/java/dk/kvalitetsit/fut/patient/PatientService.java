@@ -8,7 +8,7 @@ import java.util.List;
 public interface PatientService {
     PatientDto getPatient(String uuid) throws Exception;
 
-    List<PatientDto> getPatients();
+    List<PatientDto> getPatients(String given, String family);
 
     void removePatient(String uuid) throws Exception;
 

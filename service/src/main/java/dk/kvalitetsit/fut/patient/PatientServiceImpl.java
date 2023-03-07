@@ -3,12 +3,15 @@ package dk.kvalitetsit.fut.patient;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
+import ca.uhn.fhir.rest.gclient.ICriterion;
+import ca.uhn.fhir.rest.gclient.IQuery;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.kvalitetsit.fut.auth.AuthService;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Patient;
-import org.openapitools.model.PatientDto;
+import org.hl7.fhir.r4.model.Resource;
 import org.openapitools.model.CreatePatientDto;
+import org.openapitools.model.PatientDto;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,25 +37,18 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public List<PatientDto> getPatients() {
-        BearerTokenAuthInterceptor authInterceptor = null;
-        try {
-            authInterceptor = new BearerTokenAuthInterceptor( authService.getToken() );
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+    public List<PatientDto> getPatients(String given, String family) {
+        List<ICriterion> criteria = new ArrayList<>();
+        if (given != null) {
+            criteria.add(Patient.GIVEN.matches().value(given));
+        }
+        if (family != null) {
+            criteria.add(Patient.FAMILY.matches().value(family));
         }
 
-        IGenericClient client = fhirContext.newRestfulGenericClient(patientServiceUrl);
-        client.registerInterceptor(authInterceptor);
+        List<Patient> result = lookupByCriteria(Patient.class, criteria);
 
-        Bundle result = client
-                .search()
-                .forResource(Patient.class)
-                .returnBundle(Bundle.class)
-                .execute();
-
-        return result.getEntry().stream()
-                .map(bundleEntryComponent -> (Patient)bundleEntryComponent.getResource())
+        return result.stream()
                 .map(patient -> PatientMapper.mapPatient(patient))
                 .collect(Collectors.toList());
     }
@@ -69,6 +65,40 @@ public class PatientServiceImpl implements PatientService {
         return constructPatient(patient);
     }
 
+    private <T extends Resource> List<T> lookupByCriteria(Class<T> resourceClass, List<ICriterion> criteria) {
+        IGenericClient client = getFhirClient();
+
+        IQuery<Bundle> query = client
+                .search()
+                .forResource(resourceClass)
+                .returnBundle(Bundle.class);
+
+        if (!criteria.isEmpty()) {
+            query = query.where(criteria.get(0));
+            for(int i = 1; i < criteria.size(); i++) {
+                query = query.and(criteria.get(i));
+            }
+        }
+
+        Bundle result = query.execute();
+
+        return result.getEntry().stream()
+                .map(bundleEntryComponent -> (T)bundleEntryComponent.getResource())
+                .collect(Collectors.toList());
+    }
+
+    private IGenericClient getFhirClient() {
+        BearerTokenAuthInterceptor authInterceptor = null;
+        try {
+            authInterceptor = new BearerTokenAuthInterceptor( authService.getToken() );
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        IGenericClient client = fhirContext.newRestfulGenericClient(patientServiceUrl);
+        client.registerInterceptor(authInterceptor);
+        return client;
+    }
 
     private PatientDto constructPatient(CreatePatientDto createPatient) {
         PatientDto patient = new PatientDto();

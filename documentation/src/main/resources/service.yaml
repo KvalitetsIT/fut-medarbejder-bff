@@ -74,6 +74,19 @@ paths:
         - patients
       summary: get patients
       description: Request a list of patients.
+      parameters:
+        - in: query
+          name: given
+          description: Search patients by given name
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: family
+          description: Search patients by family name
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Ok

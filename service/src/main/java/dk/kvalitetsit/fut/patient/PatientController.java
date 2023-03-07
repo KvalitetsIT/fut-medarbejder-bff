@@ -37,6 +37,13 @@ public class PatientController implements PatientsApi {
     }
 
     @Override
+    public ResponseEntity<List<PatientDto>> v1PatientsGet(String given, String family) {
+        List<PatientDto> patients = patientService.getPatients(given, family);
+        return ResponseEntity.ok(patients);
+        //return null;
+    }
+
+    @Override
     public ResponseEntity<PatientDto> v1PatientsIdGet(String id) {
         try {
             PatientDto patient = patientService.getPatient(id);
@@ -44,11 +51,5 @@ public class PatientController implements PatientsApi {
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Removing the patient was not possible");
         }
-    }
-
-    @Override
-    public ResponseEntity<List<PatientDto>> v1PatientsGet() {
-        List<PatientDto> patients = patientService.getPatients();
-        return ResponseEntity.ok(patients);
     }
 }
