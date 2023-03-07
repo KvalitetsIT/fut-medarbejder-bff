@@ -82,6 +82,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/patients'
 
+  /v1/careteams:
+    get:
+      tags:
+        - organization
+      summary: get careteams
+      description: Request a list of careteams.
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CareTeams'
+
   /v1/patients/{id}:
     parameters:
       - in: path
@@ -171,10 +185,10 @@ components:
           type: string
           nullable: true
 
-    patients:
+    CareTeams:
       type: array
       items:
-        $ref: '#/components/schemas/patient'
+        $ref: '#/components/schemas/CareTeam'
 
     CareTeam:
       type: object
@@ -191,6 +205,11 @@ components:
           description: the status of the careteam
           type: string
           example: "active"
+
+    patients:
+      type: array
+      items:
+        $ref: '#/components/schemas/patient'
 
     patient:
       type: object

@@ -21,6 +21,10 @@ public class AuthService {
     }
 
     public String getToken() throws JsonProcessingException {
+        return this.getToken("Gr6_medarbejder9", "Test1266");
+    }
+
+    public String getToken(String username, String password) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -28,8 +32,8 @@ public class AuthService {
 
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("grant_type", "password");
-        map.add("username", "Gr6_medarbejder9");
-        map.add("password", "Test1266");
+        map.add("username", username);
+        map.add("password", password);
         map.add("client_id", "oio_mock");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
