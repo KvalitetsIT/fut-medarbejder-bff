@@ -2,10 +2,11 @@ package dk.kvalitetsit.fut.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import dk.kvalitetsit.fut.organization.OrganizationController;
+import org.openapitools.model.UserInfoDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -46,20 +47,31 @@ public class AuthService {
 
         return map2.get("access_token");
     }
-/*
-    public UserInfoDto getUserInfo(String accessToken) {
+
+    public UserInfoDto getUserInfo(String accessToken) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
-        UserInfoDto dto = new UserInfoDto();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setBearerAuth(accessToken);
 
+        ResponseEntity<String> response = restTemplate.exchange(
+                authUserinfoUrl,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                String.class
+        );
 
-        //ResponseEntity<String> response = restTemplate.getForObject()
+        ObjectMapper mapper = new ObjectMapper();
+        Map<Object, String> map = mapper.readValue(response.getBody(), Map.class);
+        UserInfoDto dto = new UserInfoDto();
+        dto.setName(map.get("name"));
+        dto.setUserId(map.get("user_id"));
+        dto.setCpr(map.get("cpr"));
+        dto.setUserType(map.get("user_type"));
+        dto.setPreferredUsername("preferred_username");
 
         return dto;
     }
-    */
 
 }

@@ -2,8 +2,6 @@ package dk.kvalitetsit.fut.organization;
 
 import org.openapitools.api.OrganizationApi;
 import org.openapitools.model.CareTeamDto;
-import org.openapitools.model.CreatePatientDto;
-import org.openapitools.model.PatientDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -21,8 +19,8 @@ public class OrganizationController implements OrganizationApi {
     private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);
 
 
-    public OrganizationController(OrganizationServiceImpl patientService) {
-        this.organizationService = patientService;
+    public OrganizationController(OrganizationServiceImpl organizationService) {
+        this.organizationService = organizationService;
     }
 
     @Override

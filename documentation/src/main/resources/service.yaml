@@ -181,19 +181,19 @@ components:
       description: "Forbidden. This could be because: <br> * The requested information does not belong the organisation of the user <br> * The calling user does not have the required roles"
   schemas:
 
-#    UserInfo:
-#      type: object
-#      properties:
-#        user_id:
-#          type: string
-#        user_type:
-#          type: string
-#        cpr:
-#          type: string
-#        name:
-#          type: string
-#        preferred_username:
-#          type: string
+    UserInfo:
+      type: object
+      properties:
+        user_id:
+          type: string
+        user_type:
+          type: string
+        cpr:
+          type: string
+        name:
+          type: string
+        preferred_username:
+          type: string
 
     CareTeams:
       type: array
