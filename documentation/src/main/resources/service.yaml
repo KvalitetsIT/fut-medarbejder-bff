@@ -171,6 +171,48 @@ paths:
 #              schema:
 #                $ref: '#/components/schemas/patient'
 
+  /v1/episodeofcares:
+    post:
+      tags:
+        - EpisodeOfCares
+      summary: Create patient
+      description: Create a new Episode Of Care
+      requestBody:
+        description: A new episode of care.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createEpisodeOfCare'
+      responses:
+        '201':
+          description: The Episode Of Care is created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/episodeofcare'
+        '401':
+          $ref: '#/components/responses/401'
+    get:
+      tags:
+        - EpisodeOfCares
+      summary: get episode of cares
+      description: Request a list of episode of cares.
+      parameters:
+        - in: query
+          name: careTeamId
+          description: an uuid identifying the careteam responsible for the episode of cares
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/episodeofcares'
+
 components:
   responses:
     '400':
@@ -266,6 +308,55 @@ components:
           description: the patients lastname
           type: string
           example: "Dow"
+
+    episodeofcares:
+      type: array
+      items:
+        $ref: '#/components/schemas/episodeofcare'
+
+    episodeofcare:
+      type: object
+      properties:
+        uuid:
+          description: an uuid identifying the patient
+          type: string
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        status:
+          description: status of episode of care
+          type: string
+          enum: [planned, waitlist, active, onhold, finished, cancelled, entered-in-error]
+        start:
+          description: start date for episode of care
+          type: string
+          format: date-time
+        end:
+          description: end date for episode of care
+          type: string
+          format: date-time
+        patientId:
+          description: uuid identifying the patient for this episode of care
+          type: string
+
+    createEpisodeOfCare:
+      type: object
+      properties:
+        provenance:
+          description: the legeal authority
+          type: string
+          enum:
+            - http://ehealth.sundhed.dk/policy/dk/sundhedsloven
+            - http://ehealth.sundhed.dk/policy/dk/serviceloven
+        patientId:
+          description: id for the Patient resource
+          type: string
+        careTeamId:
+          description: id for CareTeam facilitation this episode of care
+          type: string
+        conditionCode:
+          description: List of conditions/problems/diagnoses this episode of care is for
+          type: array
+          items:
+            type: string
 
     helloRequest:
       type: object
