@@ -207,17 +207,32 @@ components:
       type: object
       properties:
         uuid:
-          description: an uuid identifying the careteam
+          description: An uuid identifying the careteam
           type: string
           example: "123e4567-e89b-12d3-a456-426614174000"
         name:
-          description: the name of the careteam
+          description: Name of the careteam
           type: string
           example: "Careteam A Grp6"
         status:
-          description: the status of the careteam
+          description: Status of the careteam
           type: string
           example: "active"
+        reasonCode:
+          description: Describes why the care team exists
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              display:
+                type: string
+        managingOrganization:
+          description: Organization responsible for the care team
+          type: array
+          items:
+            type: string
 
     patients:
       type: array
