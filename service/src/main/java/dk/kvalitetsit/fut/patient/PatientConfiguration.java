@@ -32,42 +32,4 @@ public class PatientConfiguration implements WebMvcConfigurer {
         return new PatientServiceImpl(fhirContext, patientServiceUrl, authService);
     }
 
-    @Value("${ALLOWED_ORIGINS:http://localhost:3000}")
-    private List<String> allowedOrigins;
-
-    @Bean
-    public FilterRegistrationBean<CorsFilter> corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        allowedOrigins.forEach(config::addAllowedOrigin);
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-
-        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
-        bean.setOrder(0);
-
-        return bean;
-    }
-
-    @Configuration
-    public static class FilterConfiguration {
-        @Bean
-        public Filter loggerFilter() {
-            return new Filter() {
-                private static final Logger logger = LoggerFactory.getLogger(PatientConfiguration.class);
-                @Override
-                public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-                    HttpServletRequest httpRequest = (HttpServletRequest) request;
-
-                    logger.info(String.format("Received an %s request at: %s", httpRequest.getMethod(), httpRequest.getRequestURI()));
-                    chain.doFilter(request, response);
-                }
-            };
-        }
-
-    }
-
-
 }

@@ -13,11 +13,12 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
 public class AuthService {
+    private final String authTokenUrl;
+    private final String authUserinfoUrl;
 
-    private String authServerUrl;
-
-    public AuthService(String authServerUrl) {
-        this.authServerUrl = authServerUrl;
+    public AuthService(String authServerUrl, String authUserinfoUrl) {
+        this.authTokenUrl = authServerUrl;
+        this.authUserinfoUrl = authUserinfoUrl;
     }
 
     public String getToken() throws JsonProcessingException {
@@ -38,13 +39,27 @@ public class AuthService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(authServerUrl, request, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(authTokenUrl, request, String.class);
 
         ObjectMapper mapper = new ObjectMapper();
         Map<Object, String> map2 = mapper.readValue(response.getBody(), Map.class);
 
         return map2.get("access_token");
-
-
     }
+/*
+    public UserInfoDto getUserInfo(String accessToken) {
+        RestTemplate restTemplate = new RestTemplate();
+        UserInfoDto dto = new UserInfoDto();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setBearerAuth(accessToken);
+
+
+        //ResponseEntity<String> response = restTemplate.getForObject()
+
+        return dto;
+    }
+    */
+
 }

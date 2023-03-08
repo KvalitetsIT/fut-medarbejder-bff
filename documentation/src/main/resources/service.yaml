@@ -180,23 +180,20 @@ components:
     '403':
       description: "Forbidden. This could be because: <br> * The requested information does not belong the organisation of the user <br> * The calling user does not have the required roles"
   schemas:
-    helloResponse:
-      type: object
-      required:
-        - name
-        - now
-      properties:
-        name:
-          description: Your name
-          type: string
-          example: "John Doe"
-        now:
-          description: Time request was received
-          type: string
-          format: date-time
-        i_can_be_null:
-          type: string
-          nullable: true
+
+#    UserInfo:
+#      type: object
+#      properties:
+#        user_id:
+#          type: string
+#        user_type:
+#          type: string
+#        cpr:
+#          type: string
+#        name:
+#          type: string
+#        preferred_username:
+#          type: string
 
     CareTeams:
       type: array
@@ -270,9 +267,6 @@ components:
           type: string
           example: "Dow"
 
-
-
-
     helloRequest:
       type: object
       required:
@@ -283,3 +277,21 @@ components:
           type: string
           example: "John Doe"
           maxLength: 8
+
+    helloResponse:
+      type: object
+      required:
+        - name
+        - now
+      properties:
+        name:
+          description: Your name
+          type: string
+          example: "John Doe"
+        now:
+          description: Time request was received
+          type: string
+          format: date-time
+        i_can_be_null:
+          type: string
+          nullable: true

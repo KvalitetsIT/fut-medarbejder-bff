@@ -8,12 +8,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AuthConfiguration {
 
-    @Value("${auth.server.url}")
-    private String authServerUrl;
+    @Value("${auth.token.url}")
+    private String authTokenUrl;
+
+    @Value("${auth.userinfo.url}")
+    private String authUserinfoUrl;
 
     @Bean
     public AuthService getAuthService() {
-        return new AuthService(authServerUrl);
+        return new AuthService(authTokenUrl, authUserinfoUrl);
     }
 
     @Bean
