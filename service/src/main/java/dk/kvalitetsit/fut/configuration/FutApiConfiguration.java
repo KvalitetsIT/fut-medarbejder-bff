@@ -1,4 +1,4 @@
-package dk.kvalitetsit.fut.auth;
+package dk.kvalitetsit.fut.configuration;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
