@@ -1,5 +1,6 @@
 package dk.kvalitetsit.fut.organization;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,14 +10,12 @@ import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CareTeam;
-import org.hl7.fhir.r4.model.CodeableConcept;
 import org.openapitools.model.CareTeamDto;
-import org.openapitools.model.CareTeamReasonCodeInnerDto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import dk.kvalitetsit.fut.auth.AuthService;
-import org.openapitools.model.UserInfoDto;
+import org.openapitools.model.PatientDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,15 +35,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public List<CareTeamDto> getCareTeams() throws JsonProcessingException {
 
-        String accessToken = authService.getToken("Gr6_medarbejder12", "Test1266");
-        BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(accessToken);
-        IGenericClient client = fhirContext.newRestfulGenericClient(organizationServiceUrl);
-        client.registerInterceptor(authInterceptor);
-
-        // TODO: test - remove when done
-        UserInfoDto userInfo = authService.getUserInfo(accessToken);
-        logger.info("user_id " + userInfo.getUserId());
-        //
+        IGenericClient client = getFhirClient();
 
         Bundle result = client
                 .search()
@@ -54,25 +45,48 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         return result.getEntry().stream()
                 .map(bundleEntryComponent -> (CareTeam) bundleEntryComponent.getResource())
-                .map(careTeam -> {
-                    CareTeamDto dto = new CareTeamDto();
-                    dto.setUuid(careTeam.getIdElement().toUnqualifiedVersionless().getIdPart());
-                    dto.setName(careTeam.getName());
-                    dto.setStatus(careTeam.getStatus().name());
-
-                    List<CodeableConcept> reasons = careTeam.getReasonCode();
-                    dto.setReasonCode(reasons.stream().map( (code -> {
-                        CareTeamReasonCodeInnerDto reasonDto = new CareTeamReasonCodeInnerDto();
-                        reasonDto.code(code.getCoding().get(0).getCode());
-                        reasonDto.display(code.getCoding().get(0).getDisplay());
-                        return reasonDto;
-                    })).toList());
-
-                    List<org.hl7.fhir.r4.model.Reference> orgs = careTeam.getManagingOrganization();
-                    dto.setManagingOrganization(orgs.stream().map(o -> o.getReference()).toList());
-
-                    return dto;
-                })
+                .map(OrganizationMapper::mapCareTeam)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CareTeamDto getCareTeam(String careTeamId) throws Exception {
+        IGenericClient client = getFhirClient();
+        CareTeam careTeam = client.read().resource(CareTeam.class).withId(careTeamId).execute();
+        return OrganizationMapper.mapCareTeam(careTeam);
+    }
+
+    @Override
+    public List<PatientDto> getPatientsForCareTeam() throws Exception {
+
+        /*       // EKSPERIMENT
+        // TODO: Ryd op når du er færdig :)
+        // Får jeg CareTeams for andre end mig selv igennem FUT API??
+
+        // Medarbejder er hardkodet indtil videre
+        String accessToken = authService.getToken("Gr6_medarbejder12", "Test1266");
+        BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(accessToken);
+        IGenericClient client = fhirContext.newRestfulGenericClient(organizationServiceUrl);
+        client.registerInterceptor(authInterceptor);
+
+        // Hvem er jeg?
+        UserInfoDto userInfo = authService.getUserInfo(accessToken);
+        logger.info("user_id " + userInfo.getUserId());
+
+        // Vi låner lige kaldet til CareTeams
+        List<CareTeamDto> careTeams = getCareTeams();
+        */
+        // Map til liste af patienter
+        List<PatientDto> patients = new ArrayList<PatientDto>();
+
+        return patients;
+    }
+
+    private IGenericClient getFhirClient() throws JsonProcessingException {
+        String accessToken = authService.getToken("Gr6_medarbejder12", "Test1266");
+        BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(accessToken);
+        IGenericClient client = fhirContext.newRestfulGenericClient(organizationServiceUrl);
+        client.registerInterceptor(authInterceptor);
+        return client;
     }
 }

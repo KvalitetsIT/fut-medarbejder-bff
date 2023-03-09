@@ -109,6 +109,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/CareTeams'
 
+  /v1/careteams/{id}/patients:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: the uuid corresponding to the patient of interest
+    get:
+      tags:
+        - organization
+      summary: get patients for a careteam
+      description: Request a list of patients for a careteam
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patients'
+
+  /v1/careteams/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the CareTeam
+    get:
+      tags:
+        - organization
+      summary: get CareTeam
+      description: Request a CareTeam with a given id
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CareTeam'
+
   /v1/patients/{id}:
     parameters:
       - in: path
