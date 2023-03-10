@@ -4,40 +4,51 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import dk.kvalitetsit.fut.patient.PatientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CareTeam;
-import org.openapitools.model.CareTeamDto;
+import org.hl7.fhir.r4.model.CarePlan;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import dk.kvalitetsit.fut.auth.AuthService;
 import org.openapitools.model.ContextDto;
 import org.openapitools.model.PatientDto;
 import org.openapitools.model.UserInfoDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openapitools.model.CareTeamDto;
+
+import dk.kvalitetsit.fut.auth.AuthService;
 
 
 public class OrganizationServiceImpl implements OrganizationService {
     private static final Logger logger = LoggerFactory.getLogger(OrganizationServiceImpl.class);
     private final FhirContext fhirContext;
     private final String organizationServiceUrl;
+    private final String carePlanServiceUrl;
     private final AuthService authService;
+    private final PatientService patientService;
 
-    public OrganizationServiceImpl(FhirContext fhirContext, String organizationServiceUrl, AuthService authService) {
+    public OrganizationServiceImpl(FhirContext fhirContext,
+                                   String organizationServiceUrl,
+                                   String carePlanServiceUrl,
+                                   PatientService patientService,
+                                   AuthService authService) {
         this.fhirContext = fhirContext;
         this.organizationServiceUrl = organizationServiceUrl;
+        this.carePlanServiceUrl = carePlanServiceUrl;
+        this.patientService = patientService;
         this.authService = authService;
     }
 
     @Override
     public List<CareTeamDto> getCareTeams() throws JsonProcessingException {
-
-        IGenericClient client = getFhirClient();
+        AuthService.Token token = authService.getToken("Gr6_medarbejder12", "Test1266");
+        IGenericClient client = getFhirClient(organizationServiceUrl, token);
 
         Bundle result = client
                 .search()
@@ -53,56 +64,53 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public CareTeamDto getCareTeam(String careTeamId) throws Exception {
-        IGenericClient client = getFhirClient();
+        AuthService.Token token = authService.getToken("Gr6_medarbejder12", "Test1266");
+        IGenericClient client = getFhirClient(organizationServiceUrl, token);
         CareTeam careTeam = client.read().resource(CareTeam.class).withId(careTeamId).execute();
         return OrganizationMapper.mapCareTeam(careTeam);
     }
 
     @Override
     public List<PatientDto> getPatientsForCareTeam() throws Exception {
-        /**
-         * Proceduren for at fremsøge og se detaljerne i et CareTeam, for en bestemt medarbejder, er:
-         * 1. Få normalt access_token.
-         * 2. Se din context. Her kan du se dine CareTeams.
-         * 3. Få et ny access_token med dit valgte CareTeam som context.
-         * 4. Fremsøg CarePlans.
-         * 5. Sæt en udvalgt CarePlan på som context.
-         * 6. Fremsøg nu specifik CarePlan med indhold. Her finder du patienten (under Subject).
-         * 7. Gør det samme for alle CarePlans (step 4 og frem).
-         */
+        List<PatientDto> patients = new ArrayList<>();
 
         // Lav klient
         AuthService.Token token = authService.getToken("Gr6_medarbejder12", "Test1266");
-        BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(token.accessToken());
-        IGenericClient client = fhirContext.newRestfulGenericClient(organizationServiceUrl);
-        client.registerInterceptor(authInterceptor);
 
-        // Skaf bruger-context
+        // Find et CareTeam til context
         UserInfoDto userInfo = authService.getUserInfo(token.accessToken());
         logger.info("user_id " + userInfo.getUserId());
         ContextDto context = authService.getContext(token.accessToken());
 
-        List<PatientDto> patients = new ArrayList<>();
-
-        // TODO: Switch context (CareTeam)
+        // Switch context (CareTeam)
         String careTeamId = context.getCareTeams().get(0).getUuid();
         token = authService.refreshTokenWithCareTeamContext(token, careTeamId);
-        logger.info(token.accessToken());
+        IGenericClient client = getFhirClient(carePlanServiceUrl, token);
 
-        // TODO: Hent CarePlans
+        // Henter CarePlans
+        Bundle result  = client
+                .search()
+                .forResource(CarePlan.class)
+                .returnBundle(Bundle.class)
+                .where(CarePlan.CARE_TEAM.hasId(careTeamId))
+                .execute();
+        List<CarePlan> list = result.getEntry().stream()
+                .map(bundleEntryComponent -> (CarePlan)bundleEntryComponent.getResource())
+                .toList();
 
-        // TODO: Hent detaljer for hver CarePlan (via context switch)
-
-        // TODO: Map til patienter
-
+        // Lav PatientDto'er
+        list.forEach(carePlan -> {
+            PatientDto patientDto = new PatientDto();
+            patientDto.setUuid(carePlan.getSubject().getReference());
+            patients.add(patientDto);
+        });
 
         return patients;
     }
 
-    private IGenericClient getFhirClient() throws JsonProcessingException {
-        AuthService.Token token = authService.getToken("Gr6_medarbejder12", "Test1266");
+    private IGenericClient getFhirClient(String url, AuthService.Token token) {
         BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(token.accessToken());
-        IGenericClient client = fhirContext.newRestfulGenericClient(organizationServiceUrl);
+        IGenericClient client = fhirContext.newRestfulGenericClient(url);
         client.registerInterceptor(authInterceptor);
         return client;
     }
