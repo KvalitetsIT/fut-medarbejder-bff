@@ -25,10 +25,17 @@ public class AuthService {
     }
 
     public String getToken() throws JsonProcessingException {
-        return this.getToken("Gr6_medarbejder9", "Test1266");
+        return this.getToken("Gr6_medarbejder9", "Test1266", null);
+    }
+
+    public String getTokenWithPatientContext(String patientIdContext) throws JsonProcessingException {
+        return this.getToken("Gr6_medarbejder9", "Test1266", patientIdContext);
     }
 
     public String getToken(String username, String password) throws JsonProcessingException {
+        return this.getToken(username, password, null);
+    }
+    public String getToken(String username, String password, String patientIdContext) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -39,6 +46,9 @@ public class AuthService {
         map.add("username", username);
         map.add("password", password);
         map.add("client_id", "oio_mock");
+        if (patientIdContext != null) {
+            map.add("patient_id", patientIdContext);
+        }
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
 

@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -32,8 +34,14 @@ public class CarePlanController implements EpisodeOfCaresApi {
     }
 
     @Override
-    public ResponseEntity<EpisodeofcareDto> v1EpisodeofcaresPost(CreateEpisodeOfCareDto createEpisodeOfCareDto) {
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "Not implemented yet.");
+    public ResponseEntity<Void> v1EpisodeofcaresPost(CreateEpisodeOfCareDto createEpisodeOfCareDto) {
+        String careTeamId = createEpisodeOfCareDto.getCareTeamId();
+        String patientId = createEpisodeOfCareDto.getPatientId();
+        CreateEpisodeOfCareDto.ProvenanceEnum provenance = createEpisodeOfCareDto.getProvenance();
+        List<String> conditionCodes = createEpisodeOfCareDto.getConditionCodes();
 
+        String episodeOfCareId = carePlanService.createEpisodeOfCare(careTeamId, patientId, provenance, conditionCodes);
+        URI location = URI.create(ServletUriComponentsBuilder.fromCurrentRequestUri().path("/" + episodeOfCareId).build().toString());
+        return ResponseEntity.created(location).build();
     }
 }
