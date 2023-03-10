@@ -86,7 +86,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         // TODO: Switch context (CareTeam)
         String careTeamId = context.getCareTeams().get(0).getUuid();
-        token = authService.refreshToken(token, careTeamId);
+        token = authService.refreshTokenWithCareTeamContext(token, careTeamId);
         logger.info(token.accessToken());
 
         // TODO: Hent CarePlans

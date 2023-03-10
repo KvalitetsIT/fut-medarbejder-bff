@@ -229,10 +229,11 @@ paths:
       responses:
         '201':
           description: The Episode Of Care is created.
-          content:
-            application/json:
+          headers:
+            Location:
               schema:
-                $ref: '#/components/schemas/episodeofcare'
+                type: string
+                format: uri
         '401':
           $ref: '#/components/responses/401'
     get:
@@ -402,7 +403,7 @@ components:
         careTeamId:
           description: id for CareTeam facilitation this episode of care
           type: string
-        conditionCode:
+        conditionCodes:
           description: List of conditions/problems/diagnoses this episode of care is for
           type: array
           items:
