@@ -45,7 +45,7 @@ public class AuthService {
         return new Token(map2.get("access_token"), map2.get("refresh_token"));
     }
 
-    private Token createToken(String username, String password, String careTeamId) throws JsonProcessingException {
+    private Token createToken(String username, String password, String careTeamId, String patientId) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -61,6 +61,10 @@ public class AuthService {
             map.add("care_team_id", careTeamId);
         }
 
+        if (patientId != null) {
+            map.add("patient_id", patientId);
+        }
+
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(authTokenUrl, request, String.class);
         ObjectMapper mapper = new ObjectMapper();
@@ -70,18 +74,22 @@ public class AuthService {
     }
 
     public Token getToken() throws JsonProcessingException {
-        return this.createToken("Gr6_medarbejder9", "Test1266", null);
+        return this.createToken("Gr6_medarbejder9", "Test1266", null, null);
     }
 
     public Token getToken(String username, String password) throws JsonProcessingException {
-        return createToken(username, password, null);
+        return createToken(username, password, null, null);
     }
 
-    public Token getToken(String username, String password, String careTeamId) throws JsonProcessingException {
-        return createToken(username, password, careTeamId);
+    public Token getTokenWithCareTeamContext(String username, String password, String careTeamId) throws JsonProcessingException {
+        return createToken(username, password, careTeamId, null);
     }
 
-    public Token refreshToken(Token token, String careTeamId) throws JsonProcessingException {
+    public Token getTokenWithPatientContext(String username, String password, String patientId) throws JsonProcessingException {
+        return this.createToken(username, password, null, patientId);
+    }
+
+    public Token refreshTokenWithCareTeamContext(Token token, String careTeamId) throws JsonProcessingException {
         return refreshToken(token.refreshToken(), careTeamId);
     }
 
