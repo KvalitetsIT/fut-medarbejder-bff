@@ -24,23 +24,23 @@ public class AuthService {
         this.authContextUrl = authContextUrl;
     }
 
-    public String getToken() throws JsonProcessingException {
-        return this.getToken("Gr6_medarbejder9", "Test1266");
-    }
-
-    public String getToken(String username, String password) throws JsonProcessingException {
+    private String createToken(String username, String password, String careTeamId) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("grant_type", "password");
         map.add("username", username);
         map.add("password", password);
         map.add("client_id", "oio_mock");
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+        if (careTeamId != null) {
+            map.add("care_team_id", careTeamId);
+        }
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
         ResponseEntity<String> response = restTemplate.postForEntity(authTokenUrl, request, String.class);
 
@@ -48,6 +48,18 @@ public class AuthService {
         Map<Object, String> map2 = mapper.readValue(response.getBody(), Map.class);
 
         return map2.get("access_token");
+    }
+
+    public String getToken() throws JsonProcessingException {
+        return this.createToken("Gr6_medarbejder9", "Test1266", null);
+    }
+
+    public String getToken(String username, String password) throws JsonProcessingException {
+        return createToken(username, password, null);
+    }
+
+    public String getToken(String username, String password, String careTeamId) throws JsonProcessingException {
+        return createToken(username, password, careTeamId);
     }
 
     public UserInfoDto getUserInfo(String accessToken) throws JsonProcessingException {
