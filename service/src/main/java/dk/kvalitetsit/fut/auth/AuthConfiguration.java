@@ -14,9 +14,12 @@ public class AuthConfiguration {
     @Value("${auth.userinfo.url}")
     private String authUserinfoUrl;
 
+    @Value("${auth.context.url}")
+    private String authContextUrl;
+
     @Bean
     public AuthService getAuthService() {
-        return new AuthService(authTokenUrl, authUserinfoUrl);
+        return new AuthService(authTokenUrl, authUserinfoUrl, authContextUrl);
     }
 
     @Bean
