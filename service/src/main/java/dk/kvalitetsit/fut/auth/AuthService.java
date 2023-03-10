@@ -25,7 +25,7 @@ public class AuthService {
         this.authContextUrl = authContextUrl;
     }
 
-    private Token refreshToken(String refreshToken, String careTeamId) throws JsonProcessingException {
+    private Token refreshToken(String refreshToken, String careTeamId, String episodeOfCareId, String patientId) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -36,6 +36,13 @@ public class AuthService {
         map.add("refresh_token", refreshToken);
         map.add("client_id", "oio_mock");
         map.add("care_team_id", careTeamId);
+        if (episodeOfCareId != null) {
+            map.add("episode_of_care_id", episodeOfCareId);
+        }
+
+        if (patientId != null) {
+            map.add("patient_id", patientId);
+        }
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(authTokenUrl, request, String.class);
@@ -90,8 +97,17 @@ public class AuthService {
     }
 
     public Token refreshTokenWithCareTeamContext(Token token, String careTeamId) throws JsonProcessingException {
-        return refreshToken(token.refreshToken(), careTeamId);
+        return refreshToken(token.refreshToken(), careTeamId, null, null);
     }
+
+    public Token refreshTokenWithCareTeamAndEpisodeOfCareContext(Token token, String careTeamId, String episodeOfCareId) throws JsonProcessingException {
+        return refreshToken(token.refreshToken(), careTeamId, episodeOfCareId, null);
+    }
+
+    public Token refreshTokenWithCareTeamAndPatientContext(Token token, String careTeamId, String patientId) throws JsonProcessingException {
+        return refreshToken(token.refreshToken(), careTeamId, null, patientId);
+    }
+
 
     public UserInfoDto getUserInfo(String accessToken) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();

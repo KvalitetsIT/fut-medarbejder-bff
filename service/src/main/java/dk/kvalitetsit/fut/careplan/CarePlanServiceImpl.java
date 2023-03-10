@@ -9,6 +9,7 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.kvalitetsit.fut.auth.AuthService;
 import org.hl7.fhir.r4.model.*;
+import org.openapitools.model.ContextDto;
 import org.openapitools.model.CreateEpisodeOfCareDto;
 import org.openapitools.model.EpisodeofcareDto;
 import org.openapitools.model.PatientDto;
@@ -170,26 +171,59 @@ public class CarePlanServiceImpl implements CarePlanService {
         return this.getFhirClient(null);
     }
     private IGenericClient getFhirClientWithPatientContext(String patientUrl) {
-        return this.getFhirClient(patientUrl);
-    }
-    private IGenericClient getFhirClient(String patientUrl) {
-        BearerTokenAuthInterceptor authInterceptor = null;
+        AuthService.Token token = null;
         try {
-            AuthService.Token token;
-            if (patientUrl != null) {
-                token = authService.getTokenWithPatientContext("Gr6_medarbejder9", "Test1266", patientUrl);
-            }
-            else {
-                token = authService.getToken();
-            }
+            token = authService.getToken();
 
-            authInterceptor = new BearerTokenAuthInterceptor(token.accessToken());
+            ContextDto context = authService.getContext(token.accessToken());
+            String careTeamId = context.getCareTeams().get(0).getUuid();
+
+            token = authService.refreshTokenWithCareTeamAndPatientContext(token, careTeamId, patientUrl);
+
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
 
+        return this.getFhirClient(token);
+    }
+
+    private IGenericClient getFhirClientWithEpisodeOfCareContext(String episodeOfCareUrl) {
+
+        AuthService.Token token = null;
+        try {
+            token = authService.getToken();
+
+            ContextDto context = authService.getContext(token.accessToken());
+            String careTeamId = context.getCareTeams().get(0).getUuid();
+
+            token = authService.refreshTokenWithCareTeamAndEpisodeOfCareContext(token, careTeamId, episodeOfCareUrl);
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return this.getFhirClient(token);
+    }
+    private IGenericClient getFhirClient(AuthService.Token token) {
+        BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(token.accessToken());
+
         IGenericClient client = fhirContext.newRestfulGenericClient(careplanServiceUrl);
         client.registerInterceptor(authInterceptor);
+
         return client;
+    }
+
+    public EpisodeofcareDto getEpisodeOfCare(String id) {
+        String episodeOfCareUrl = "https://careplan.devenvcgi.ehealth.sundhed.dk/fhir/EpisodeOfCare/"+id;
+
+        IGenericClient client = getFhirClientWithEpisodeOfCareContext(episodeOfCareUrl);
+        EpisodeOfCare result = client
+                .read()
+                .resource(EpisodeOfCare.class)
+                .withId("119965")
+                .execute();
+
+
+        return CarePlanMapper.mapEpisodeOfCare(result);
     }
 }

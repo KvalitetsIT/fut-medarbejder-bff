@@ -256,6 +256,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/episodeofcares'
 
+  /v1/episodeofcares/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the episode of care to lookup
+    get:
+      tags:
+        - EpisodeOfCares
+      summary: get episode of cares
+      description: Request an episode of care by id.
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/episodeofcare'
+
 components:
   responses:
     '400':

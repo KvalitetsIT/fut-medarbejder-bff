@@ -44,4 +44,11 @@ public class CarePlanController implements EpisodeOfCaresApi {
         URI location = URI.create(ServletUriComponentsBuilder.fromCurrentRequestUri().path("/" + episodeOfCareId).build().toString());
         return ResponseEntity.created(location).build();
     }
+
+    @Override
+    public ResponseEntity<EpisodeofcareDto> v1EpisodeofcaresIdGet(String id) {
+        EpisodeofcareDto episodeOfCare = carePlanService.getEpisodeOfCare(id);
+
+        return ResponseEntity.ok(episodeOfCare);
+    }
 }
