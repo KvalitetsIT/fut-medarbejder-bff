@@ -15,7 +15,9 @@ import org.openapitools.model.CareTeamDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import dk.kvalitetsit.fut.auth.AuthService;
+import org.openapitools.model.ContextDto;
 import org.openapitools.model.PatientDto;
+import org.openapitools.model.UserInfoDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,33 +60,48 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public List<PatientDto> getPatientsForCareTeam() throws Exception {
+        /**
+         * Proceduren for at fremsøge og se detaljerne i et CareTeam, for en bestemt medarbejder, er:
+         * 1. Få normalt access_token.
+         * 2. Se din context. Her kan du se dine CareTeams.
+         * 3. Få et ny access_token med dit valgte CareTeam som context.
+         * 4. Fremsøg CarePlans.
+         * 5. Sæt en udvalgt CarePlan på som context.
+         * 6. Fremsøg nu specifik CarePlan med indhold. Her finder du patienten (under Subject).
+         * 7. Gør det samme for alle CarePlans (step 4 og frem).
+         */
 
-        /*       // EKSPERIMENT
-        // TODO: Ryd op når du er færdig :)
-        // Får jeg CareTeams for andre end mig selv igennem FUT API??
-
-        // Medarbejder er hardkodet indtil videre
-        String accessToken = authService.getToken("Gr6_medarbejder12", "Test1266");
-        BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(accessToken);
+        // Lav klient
+        AuthService.Token token = authService.getToken("Gr6_medarbejder12", "Test1266");
+        BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(token.accessToken());
         IGenericClient client = fhirContext.newRestfulGenericClient(organizationServiceUrl);
         client.registerInterceptor(authInterceptor);
 
-        // Hvem er jeg?
-        UserInfoDto userInfo = authService.getUserInfo(accessToken);
+        // Skaf bruger-context
+        UserInfoDto userInfo = authService.getUserInfo(token.accessToken());
         logger.info("user_id " + userInfo.getUserId());
+        ContextDto context = authService.getContext(token.accessToken());
 
-        // Vi låner lige kaldet til CareTeams
-        List<CareTeamDto> careTeams = getCareTeams();
-        */
-        // Map til liste af patienter
-        List<PatientDto> patients = new ArrayList<PatientDto>();
+        List<PatientDto> patients = new ArrayList<>();
+
+        // TODO: Switch context (CareTeam)
+        String careTeamId = context.getCareTeams().get(0).getUuid();
+        token = authService.refreshToken(token, careTeamId);
+        logger.info(token.accessToken());
+
+        // TODO: Hent CarePlans
+
+        // TODO: Hent detaljer for hver CarePlan (via context switch)
+
+        // TODO: Map til patienter
+
 
         return patients;
     }
 
     private IGenericClient getFhirClient() throws JsonProcessingException {
-        String accessToken = authService.getToken("Gr6_medarbejder12", "Test1266");
-        BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(accessToken);
+        AuthService.Token token = authService.getToken("Gr6_medarbejder12", "Test1266");
+        BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(token.accessToken());
         IGenericClient client = fhirContext.newRestfulGenericClient(organizationServiceUrl);
         client.registerInterceptor(authInterceptor);
         return client;

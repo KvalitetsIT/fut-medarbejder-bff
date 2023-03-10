@@ -70,7 +70,7 @@ public class CarePlanServiceImpl implements CarePlanService {
     private IGenericClient getFhirClient() {
         BearerTokenAuthInterceptor authInterceptor = null;
         try {
-            authInterceptor = new BearerTokenAuthInterceptor( authService.getToken() );
+            authInterceptor = new BearerTokenAuthInterceptor( authService.getToken().accessToken() );
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

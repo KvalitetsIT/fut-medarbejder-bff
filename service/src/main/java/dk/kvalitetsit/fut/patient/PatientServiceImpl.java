@@ -90,7 +90,7 @@ public class PatientServiceImpl implements PatientService {
     private IGenericClient getFhirClient() {
         BearerTokenAuthInterceptor authInterceptor = null;
         try {
-            authInterceptor = new BearerTokenAuthInterceptor( authService.getToken() );
+            authInterceptor = new BearerTokenAuthInterceptor( authService.getToken().accessToken() );
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

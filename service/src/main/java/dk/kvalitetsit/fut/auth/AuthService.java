@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class AuthService {
+    public record Token(String accessToken, String refreshToken){};
     private final String authTokenUrl;
     private final String authUserinfoUrl;
     private final String authContextUrl;
@@ -24,7 +25,27 @@ public class AuthService {
         this.authContextUrl = authContextUrl;
     }
 
-    private String createToken(String username, String password, String careTeamId) throws JsonProcessingException {
+    private Token refreshToken(String refreshToken, String careTeamId) throws JsonProcessingException {
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("grant_type", "refresh_token");
+        map.add("refresh_token", refreshToken);
+        map.add("client_id", "oio_mock");
+        map.add("care_team_id", careTeamId);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(authTokenUrl, request, String.class);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<Object, String> map2 = mapper.readValue(response.getBody(), Map.class);
+
+        return new Token(map2.get("access_token"), map2.get("refresh_token"));
+    }
+
+    private Token createToken(String username, String password, String careTeamId) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -41,25 +62,27 @@ public class AuthService {
         }
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-
         ResponseEntity<String> response = restTemplate.postForEntity(authTokenUrl, request, String.class);
-
         ObjectMapper mapper = new ObjectMapper();
         Map<Object, String> map2 = mapper.readValue(response.getBody(), Map.class);
 
-        return map2.get("access_token");
+        return new Token(map2.get("access_token"), map2.get("refresh_token"));
     }
 
-    public String getToken() throws JsonProcessingException {
+    public Token getToken() throws JsonProcessingException {
         return this.createToken("Gr6_medarbejder9", "Test1266", null);
     }
 
-    public String getToken(String username, String password) throws JsonProcessingException {
+    public Token getToken(String username, String password) throws JsonProcessingException {
         return createToken(username, password, null);
     }
 
-    public String getToken(String username, String password, String careTeamId) throws JsonProcessingException {
+    public Token getToken(String username, String password, String careTeamId) throws JsonProcessingException {
         return createToken(username, password, careTeamId);
+    }
+
+    public Token refreshToken(Token token, String careTeamId) throws JsonProcessingException {
+        return refreshToken(token.refreshToken(), careTeamId);
     }
 
     public UserInfoDto getUserInfo(String accessToken) throws JsonProcessingException {
