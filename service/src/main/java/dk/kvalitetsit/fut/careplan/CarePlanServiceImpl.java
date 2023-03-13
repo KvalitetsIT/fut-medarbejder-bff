@@ -168,7 +168,11 @@ public class CarePlanServiceImpl implements CarePlanService {
     }
 
     private IGenericClient getFhirClient() {
-        return this.getFhirClient(null);
+        try {
+            return this.getFhirClient(authService.getToken());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
     private IGenericClient getFhirClientWithPatientContext(String patientUrl) {
         AuthService.Token token = null;
