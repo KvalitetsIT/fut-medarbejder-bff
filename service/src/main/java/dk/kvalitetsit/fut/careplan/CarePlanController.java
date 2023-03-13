@@ -1,21 +1,22 @@
 package dk.kvalitetsit.fut.careplan;
 
+import org.openapitools.api.ConsentApi;
 import org.openapitools.api.EpisodeOfCaresApi;
+import org.openapitools.model.ConsentDto;
+import org.openapitools.model.CreateConsentDto;
 import org.openapitools.model.CreateEpisodeOfCareDto;
 import org.openapitools.model.EpisodeofcareDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
-public class CarePlanController implements EpisodeOfCaresApi {
+public class CarePlanController implements EpisodeOfCaresApi, ConsentApi {
 
     private final CarePlanServiceImpl carePlanService;
 
@@ -50,5 +51,27 @@ public class CarePlanController implements EpisodeOfCaresApi {
         EpisodeofcareDto episodeOfCare = carePlanService.getEpisodeOfCare(id);
 
         return ResponseEntity.ok(episodeOfCare);
+    }
+
+    @Override
+    public ResponseEntity<List<ConsentDto>> v1EpisodeofcaresIdConsentGet(String episodeOfCareId) {
+        List<ConsentDto> consents = carePlanService.getConsents(episodeOfCareId);
+        return ResponseEntity.ok(consents);
+    }
+
+    @Override
+    public ResponseEntity<Void> v1EpisodeofcaresIdConsentPost(String episodeOfCareId, CreateConsentDto createConsentDto) {
+        CreateConsentDto.CategoryEnum category = createConsentDto.getCategory();
+        CreateConsentDto.StatusEnum status = createConsentDto.getStatus();
+
+        String consentId = carePlanService.createConsent(episodeOfCareId, category, status);
+        URI location = URI.create(ServletUriComponentsBuilder.fromCurrentRequestUri().path("/" + consentId).build().toString());
+        return ResponseEntity.created(location).build();
+    }
+
+    @Override
+    public ResponseEntity<ConsentDto> v1EpisodeofcaresEpisodeOfCareIdConsentConsentIdGet(String episodeOfCareId, String consentId) {
+        ConsentDto consents = carePlanService.getConsents(episodeOfCareId, consentId);
+        return ResponseEntity.ok(consents);
     }
 }

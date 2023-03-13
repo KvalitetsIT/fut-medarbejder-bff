@@ -277,6 +277,76 @@ paths:
               schema:
                 $ref: '#/components/schemas/episodeofcare'
 
+  /v1/episodeofcares/{id}/consent:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the episode of care to lookup
+    get:
+      tags:
+        - Consent
+      summary: get consent for episode of care
+      description: Request a consent for an episode of care identified by id.
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/consents'
+    post:
+      tags:
+        - Consent
+      summary: Create consent
+      description: Create a consent for a Patient to be enrolled in the episode of care identidied by id.
+      requestBody:
+        description: A new consent.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createConsent'
+      responses:
+        '201':
+          description: The Consent is created.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+        '401':
+          $ref: '#/components/responses/401'
+
+  /v1/episodeofcares/{episodeOfCareId}/consent/{consentId}:
+    parameters:
+      - in: path
+        name: episodeOfCareId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the episode of care to access specific consent for
+      - in: path
+        name: consentId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the consent to lookup
+    get:
+      tags:
+        - Consent
+      summary: get a consent for episode of care
+      description: Request a consent for an episode of care identified by id.
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/consent'
+
 components:
   responses:
     '400':
@@ -429,6 +499,50 @@ components:
           type: array
           items:
             type: string
+
+    createConsent:
+      type: object
+      properties:
+        status:
+          description: status of consent
+          type: string
+          enum: [ draft, proposed, active, rejected, inactive, entered-in-error ]
+          example: "active"
+        category:
+          description: Classification of the consent statement
+          type: string
+          enum: [ PITEOC, SSLPCI ]
+          example: "PITEOC"
+
+    consents:
+      type: array
+      items:
+        $ref: '#/components/schemas/consent'
+
+    consent:
+      type: object
+      properties:
+        id:
+          description: an id identifying the consent
+          type: string
+        status:
+          description: status of conseńt
+          type: string
+          enum: [ draft, proposed, active, rejected, inactive, entered-in-error ]
+        start:
+          description: start date for consent
+          type: string
+          format: date-time
+        end:
+          description: end date consent
+          type: string
+          format: date-time
+        episodeOfCareId:
+          description: id identifying the episode of care for this consent
+          type: string
+        patientId:
+          description: id identifying the patient for this consent
+          type: string
 
     helloRequest:
       type: object

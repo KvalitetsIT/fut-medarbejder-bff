@@ -1,23 +1,28 @@
 package dk.kvalitetsit.fut.careplan;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.IQuery;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.kvalitetsit.fut.auth.AuthService;
 import org.hl7.fhir.r4.model.*;
-import org.openapitools.model.ContextDto;
-import org.openapitools.model.CreateEpisodeOfCareDto;
-import org.openapitools.model.EpisodeofcareDto;
-import org.openapitools.model.PatientDto;
+import org.openapitools.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CarePlanServiceImpl implements CarePlanService {
+    private static final Logger logger = LoggerFactory.getLogger(CarePlanServiceImpl.class);
 
     private final Map<String, PatientDto> patients = new HashMap<>();
     private FhirContext fhirContext;
@@ -224,10 +229,105 @@ public class CarePlanServiceImpl implements CarePlanService {
         EpisodeOfCare result = client
                 .read()
                 .resource(EpisodeOfCare.class)
-                .withId("119965")
+                .withId(id)
+                .execute();
+
+        return CarePlanMapper.mapEpisodeOfCare(result);
+    }
+
+    public List<ConsentDto> getConsents(String episodeOfCareId) {
+        String episodeOfCareUrl = "https://careplan.devenvcgi.ehealth.sundhed.dk/fhir/EpisodeOfCare/"+episodeOfCareId;
+
+        IGenericClient client = getFhirClientWithEpisodeOfCareContext(episodeOfCareUrl);
+        Bundle result = client
+                .search()
+                .forResource(Consent.class)
+                .where(Consent.DATA.hasId(episodeOfCareUrl))
+                .returnBundle(Bundle.class)
+                .execute();
+
+        if (result.getEntry().isEmpty()) {
+            return null;
+        }
+        if (result.getEntry().size() > 1) {
+            logger.info(String.format("Multiple consents found for EpisodeOfCare with id: %s", episodeOfCareId));
+        }
+
+        return result.getEntry().stream()
+                .map(bundleEntryComponent -> (Consent)bundleEntryComponent.getResource())
+                .map(consent -> CarePlanMapper.mapConsent(consent))
+                .collect(Collectors.toList());
+    }
+
+    public String createConsent(String episodeOfCareId, CreateConsentDto.CategoryEnum category, CreateConsentDto.StatusEnum status) {
+        EpisodeofcareDto episodeOfCareDto = this.getEpisodeOfCare(episodeOfCareId);
+
+        String patientUrl = "https://patient.devenvcgi.ehealth.sundhed.dk/fhir/Patient/"+episodeOfCareDto.getPatientId();
+        String episodeOfCareUrl = "https://careplan.devenvcgi.ehealth.sundhed.dk/fhir/EpisodeOfCare/"+episodeOfCareId;
+
+        Consent consent = new Consent();
+        consent.getMeta().addProfile("http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-consent");
+        consent.setStatus(Consent.ConsentState.ACTIVE); // TODO: should reflect incoming status
+        consent.getScope().addCoding()
+                .setSystem("http://terminology.hl7.org/CodeSystem/consentscope")
+                .setCode("treatment")
+                .setDisplay("Treatment");
+        consent.addCategory()
+                .addCoding()
+                .setSystem("http://ehealth.sundhed.dk/cs/consent-category")
+                .setCode("PITEOC"); // TODO: should reflect incomint category
+        consent.setPatient(new Reference(patientUrl));
+        consent.setPerformer(List.of(new Reference(patientUrl)));
+
+        // the following two elements (policy rule and provision) are also required but that is not obvious from the documentation
+        consent.getPolicyRule().addCoding().setSystem("http://terminology.hl7.org/CodeSystem/consentpolicycodes").setCode("cric");
+        consent.getProvision().getPeriod().setStart(new Date());
+        consent.getProvision().addActor()
+                .setReference(new Reference(patientUrl))
+                .getRole()
+                .addCoding()
+                .setSystem("http://terminology.hl7.org/CodeSystem/extra-security-role-type")
+                .setCode("authserver");
+        consent.getProvision().getDataFirstRep()
+                .setMeaning(Consent.ConsentDataMeaning.RELATED)
+                .setReference(new Reference(episodeOfCareUrl));
+
+        // consent.create requires EpisodeOfCare and Patient in context. (EpisodeOfCare context adds implicit patient context)
+        IGenericClient client = getFhirClientWithEpisodeOfCareContext(episodeOfCareUrl);
+        MethodOutcome outcome = client.create()
+                .resource(consent)
+                .prettyPrint()
+                .encodedJson()
                 .execute();
 
 
-        return CarePlanMapper.mapEpisodeOfCare(result);
+        if (outcome.getCreated()) {
+            return outcome.getId().toUnqualifiedVersionless().getIdPart();
+        }
+        return null;
+    }
+
+    public ConsentDto getConsents(String episodeOfCareId, String consentId) {
+        ConsentDto result = null;
+
+        String episodeOfCareUrl = "https://careplan.devenvcgi.ehealth.sundhed.dk/fhir/EpisodeOfCare/"+episodeOfCareId;
+
+        IGenericClient client = getFhirClientWithEpisodeOfCareContext(episodeOfCareUrl);
+        try {
+            Consent consent = client
+                    .read()
+                    .resource(Consent.class)
+                    .withId(consentId)
+                    .execute();
+
+            result = CarePlanMapper.mapConsent(consent);
+        }
+        catch (ResourceNotFoundException rnfe) {
+            String msg = String.format("No Consent found with id: %s", consentId);
+            logger.error(msg);
+            throw new dk.kvalitetsit.fut.controller.exception.ResourceNotFoundException(msg);
+        }
+
+        return result;
     }
 }
