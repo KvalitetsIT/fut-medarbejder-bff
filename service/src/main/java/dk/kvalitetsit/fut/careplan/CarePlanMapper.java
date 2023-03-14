@@ -24,15 +24,15 @@ public class CarePlanMapper {
         return episodeofcareDto;
     }
 
-    private static EpisodeofcareDto.StatusEnum mapEpisodeOfCareStatus(EpisodeOfCare.EpisodeOfCareStatus status) {
+    private static EpisodeOfCareStatusDto mapEpisodeOfCareStatus(EpisodeOfCare.EpisodeOfCareStatus status) {
         return switch (status) {
-            case ACTIVE -> EpisodeofcareDto.StatusEnum.ACTIVE;
-            case PLANNED -> EpisodeofcareDto.StatusEnum.PLANNED;
-            case ONHOLD -> EpisodeofcareDto.StatusEnum.ONHOLD;
-            case FINISHED -> EpisodeofcareDto.StatusEnum.FINISHED;
-            case WAITLIST -> EpisodeofcareDto.StatusEnum.WAITLIST;
-            case CANCELLED -> EpisodeofcareDto.StatusEnum.CANCELLED;
-            case ENTEREDINERROR -> EpisodeofcareDto.StatusEnum.ENTERED_IN_ERROR;
+            case ACTIVE -> EpisodeOfCareStatusDto.ACTIVE;
+            case PLANNED -> EpisodeOfCareStatusDto.PLANNED;
+            case ONHOLD -> EpisodeOfCareStatusDto.ONHOLD;
+            case FINISHED -> EpisodeOfCareStatusDto.FINISHED;
+            case WAITLIST -> EpisodeOfCareStatusDto.WAITLIST;
+            case CANCELLED -> EpisodeOfCareStatusDto.CANCELLED;
+            case ENTEREDINERROR -> EpisodeOfCareStatusDto.ENTERED_IN_ERROR;
             case NULL -> null;
         };
     }
