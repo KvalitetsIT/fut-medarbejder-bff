@@ -10,15 +10,14 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.kvalitetsit.fut.auth.AuthService;
+import org.apache.logging.log4j.util.Strings;
 import org.hl7.fhir.r4.model.*;
 import org.openapitools.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.OffsetDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CarePlanServiceImpl implements CarePlanService {
@@ -329,5 +328,42 @@ public class CarePlanServiceImpl implements CarePlanService {
         }
 
         return result;
+    }
+
+    public void updateEpisodeOfCare(String id, OffsetDateTime start, OffsetDateTime end, EpisodeOfCareStatusDto status, String careTeamId) {
+        final String replaceOperation = "{\"op\": \"replace\", \"path\": \"%s\", \"value\": \"%s\"}";
+        List<String> patchOperations = new ArrayList<>();
+        if (start != null) {
+            DateTimeType newStart = new DateTimeType(Date.from(start.toInstant()));
+            patchOperations.add(String.format(replaceOperation, "/period/start", newStart.asStringValue()));
+        }
+        if (end != null) {
+            DateTimeType newEnd = new DateTimeType(Date.from(end.toInstant()));
+            patchOperations.add(String.format(replaceOperation, "/period/end", newEnd.asStringValue()));
+        }
+        if (status != null) {
+            EpisodeOfCare.EpisodeOfCareStatus newStatus = CarePlanMapper.mapEpisodeOfCareStatus(status);
+            patchOperations.add(String.format(replaceOperation, "/status", newStatus.toCode()));
+        }
+        if (careTeamId != null) {
+            // todo?
+        }
+        String patchBody = "[" + Strings.join(patchOperations, ',') + "]";
+
+
+        logger.debug(String.format("Patching EpisodeOfCare id=%s with json patch body:\n%s", id, patchBody));
+
+        String episodeOfCareUrl = "https://careplan.devenvcgi.ehealth.sundhed.dk/fhir/EpisodeOfCare/"+id;
+        IGenericClient client = getFhirClientWithEpisodeOfCareContext(episodeOfCareUrl);
+
+        MethodOutcome outcome = client.patch()
+                .withBody(patchBody)
+                .withId("EpisodeOfCare/"+id)
+                .execute();
+
+        // optional for server to return actual updated resource.
+        //EpisodeOfCare resultingResource = (EpisodeOfCare) outcome.getResource();
+
+        logger.info(String.format("Updated EpisodeOfCare with id: %s", outcome.getId().toUnqualifiedVersionless().getIdPart()));
     }
 }
