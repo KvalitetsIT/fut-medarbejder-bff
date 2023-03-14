@@ -15,6 +15,8 @@ import java.util.Map;
 
 public class AuthService {
     public record Token(String accessToken, String refreshToken){};
+    public final String USERNAME = "Gr6_medarbejder9";
+    public final String PASSWORD = "Test1266";
     private final String authTokenUrl;
     private final String authUserinfoUrl;
     private final String authContextUrl;
@@ -81,7 +83,7 @@ public class AuthService {
     }
 
     public Token getToken() throws JsonProcessingException {
-        return this.createToken("Gr6_medarbejder9", "Test1266", null, null);
+        return this.createToken(USERNAME, PASSWORD, null, null);
     }
 
     public Token getToken(String username, String password) throws JsonProcessingException {

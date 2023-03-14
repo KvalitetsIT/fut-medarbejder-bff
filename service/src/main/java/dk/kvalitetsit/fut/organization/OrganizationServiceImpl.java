@@ -47,7 +47,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public List<CareTeamDto> getCareTeams() throws JsonProcessingException {
-        AuthService.Token token = authService.getToken("Gr6_medarbejder12", "Test1266");
+        AuthService.Token token = authService.getToken();
         IGenericClient client = getFhirClient(organizationServiceUrl, token);
 
         Bundle result = client
@@ -64,7 +64,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public CareTeamDto getCareTeam(String careTeamId) throws Exception {
-        AuthService.Token token = authService.getToken("Gr6_medarbejder12", "Test1266");
+        AuthService.Token token = authService.getToken();
         IGenericClient client = getFhirClient(organizationServiceUrl, token);
         CareTeam careTeam = client.read().resource(CareTeam.class).withId(careTeamId).execute();
         return OrganizationMapper.mapCareTeam(careTeam);
@@ -75,7 +75,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         List<PatientDto> patients = new ArrayList<>();
 
         // Lav klient
-        AuthService.Token token = authService.getToken("Gr6_medarbejder12", "Test1266");
+        AuthService.Token token = authService.getToken();
 
         // Find et CareTeam til context
         UserInfoDto userInfo = authService.getUserInfo(token.accessToken());
