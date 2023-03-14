@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import dk.kvalitetsit.fut.patient.PatientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,22 +44,12 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public List<CareTeamDto> getCareTeams() throws JsonProcessingException {
         AuthService.Token token = authService.getToken();
-        IGenericClient client = getFhirClient(organizationServiceUrl, token);
-
-        Bundle result = client
-                .search()
-                .forResource(CareTeam.class)
-                .returnBundle(Bundle.class)
-                .execute();
-
-        return result.getEntry().stream()
-                .map(bundleEntryComponent -> (CareTeam) bundleEntryComponent.getResource())
-                .map(OrganizationMapper::mapCareTeam)
-                .collect(Collectors.toList());
+        UserInfoDto userInfo = authService.getUserInfo(token);
+        return getCareTeams(userInfo.getUserId());
     }
 
     @Override
-    public List<CareTeamDto> getCareTeams(int participantId) throws Exception {
+    public List<CareTeamDto> getCareTeams(int participantId) throws JsonProcessingException {
         AuthService.Token token = authService.getToken();
         IGenericClient client = getFhirClient(organizationServiceUrl, token);
 
@@ -93,8 +82,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         AuthService.Token token = authService.getToken();
 
         // Find et CareTeam til context
-        UserInfoDto userInfo = authService.getUserInfo(token.accessToken());
-        ContextDto context = authService.getContext(token.accessToken());
+        UserInfoDto userInfo = authService.getUserInfo(token);
+        ContextDto context = authService.getContext(token);
 
         // Switch context (CareTeam)
         String careTeamId = context.getCareTeams().get(0).getUuid();

@@ -420,8 +420,10 @@ components:
     UserInfo:
       type: object
       properties:
-        user_id:
+        uuid:
           type: string
+        user_id:
+          type: int
         user_type:
           type: string
         cpr:

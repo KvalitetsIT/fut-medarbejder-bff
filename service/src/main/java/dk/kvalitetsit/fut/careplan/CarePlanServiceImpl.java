@@ -183,7 +183,7 @@ public class CarePlanServiceImpl implements CarePlanService {
         try {
             token = authService.getToken();
 
-            ContextDto context = authService.getContext(token.accessToken());
+            ContextDto context = authService.getContext(token);
             String careTeamId = context.getCareTeams().get(0).getUuid();
 
             token = authService.refreshTokenWithCareTeamAndPatientContext(token, careTeamId, patientUrl);
@@ -201,7 +201,7 @@ public class CarePlanServiceImpl implements CarePlanService {
         try {
             token = authService.getToken();
 
-            ContextDto context = authService.getContext(token.accessToken());
+            ContextDto context = authService.getContext(token);
             String careTeamId = context.getCareTeams().get(0).getUuid();
 
             token = authService.refreshTokenWithCareTeamAndEpisodeOfCareContext(token, careTeamId, episodeOfCareUrl);

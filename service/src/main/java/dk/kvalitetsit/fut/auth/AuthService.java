@@ -111,12 +111,12 @@ public class AuthService {
     }
 
 
-    public UserInfoDto getUserInfo(String accessToken) throws JsonProcessingException {
+    public UserInfoDto getUserInfo(Token token) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setBearerAuth(accessToken);
+        headers.setBearerAuth(token.accessToken());
 
         ResponseEntity<String> response = restTemplate.exchange(
                 authUserinfoUrl,
@@ -129,7 +129,12 @@ public class AuthService {
         Map<Object, String> map = mapper.readValue(response.getBody(), Map.class);
         UserInfoDto dto = new UserInfoDto();
         dto.setName(map.get("name"));
-        dto.setUserId(map.get("user_id"));
+        dto.setUuid(map.get("user_id"));
+
+        // Her havde det været pænere lige at kalde på Participant-resursen og sikre sig,
+        // at man får det faktiske id, på den participant, der er logget ind.
+        int id = Integer.parseInt(dto.getUuid().substring(dto.getUuid().lastIndexOf("/") + 1));
+        dto.setUserId(id);
         dto.setCpr(map.get("cpr"));
         dto.setUserType(map.get("user_type"));
         dto.setPreferredUsername("preferred_username");
@@ -137,12 +142,12 @@ public class AuthService {
         return dto;
     }
 
-    public ContextDto getContext(String accessToken) throws JsonProcessingException {
+    public ContextDto getContext(Token token) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setBearerAuth(accessToken);
+        headers.setBearerAuth(token.accessToken());
 
         ResponseEntity<String> response = restTemplate.exchange(
                 authContextUrl,
