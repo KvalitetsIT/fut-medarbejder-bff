@@ -386,6 +386,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/consent'
 
+  /v1/plandefinitions:
+    get:
+      tags:
+        - PlanDefinitions
+      summary: get plandefinitions
+      description: Request a list of active plandefinitions.
+      parameters:
+        - in: query
+          name: title
+          description: Title of plandefinition (patient title/borgervendt navn)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/plandefinitions'
+
 components:
   responses:
     '400':
@@ -603,6 +624,28 @@ components:
           type: string
         patientId:
           description: id identifying the patient for this consent
+          type: string
+
+    plandefinitions:
+      type: array
+      items:
+        $ref: '#/components/schemas/plandefinition'
+
+    plandefinition:
+      type: object
+      properties:
+        id:
+          description: an id identifying the plandefinition
+          type: string
+        status:
+          description: status of plandefinition
+          type: string
+          enum: [ draft, active, retired, unknown ]
+        patientTitle:
+          description: Title for patients
+          type: string
+        clinicianTitle:
+          description: Title for clinicians
           type: string
 
     helloRequest:
