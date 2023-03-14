@@ -276,6 +276,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/episodeofcare'
+    patch:
+      tags:
+        - EpisodeOfCares
+      summary: update episode of care
+      description: Update an episode of care by id.
+      requestBody:
+        description: A new consent.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateEpisodeOfCare'
+      responses:
+        '200':
+          description: Ok
+        '401':
+          $ref: '#/components/responses/401'
+
 
   /v1/episodeofcares/{id}/consent:
     parameters:
@@ -465,8 +483,7 @@ components:
           example: "123e4567-e89b-12d3-a456-426614174000"
         status:
           description: status of episode of care
-          type: string
-          enum: [planned, waitlist, active, onhold, finished, cancelled, entered-in-error]
+          $ref: '#/components/schemas/episodeOfCareStatus'
         start:
           description: start date for episode of care
           type: string
@@ -499,6 +516,29 @@ components:
           type: array
           items:
             type: string
+
+    updateEpisodeOfCare:
+      type: object
+      properties:
+        start:
+          description: start date for episode of care
+          type: string
+          format: date-time
+        end:
+          description: end date for episode of care
+          type: string
+          format: date-time
+        careTeamId:
+          description: id for CareTeam facilitation this episode of care
+          type: string
+        status:
+          description: status of episode of care
+          $ref: '#/components/schemas/episodeOfCareStatus'
+
+    episodeOfCareStatus:
+      type: string
+      enum: [ planned, waitlist, active, onhold, finished, cancelled, entered-in-error ]
+      example: "active"
 
     createConsent:
       type: object

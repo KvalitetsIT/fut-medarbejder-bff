@@ -3,6 +3,7 @@ package dk.kvalitetsit.fut.careplan;
 import org.hl7.fhir.r4.model.Consent;
 import org.hl7.fhir.r4.model.EpisodeOfCare;
 import org.openapitools.model.ConsentDto;
+import org.openapitools.model.EpisodeOfCareStatusDto;
 import org.openapitools.model.EpisodeofcareDto;
 
 import java.time.OffsetDateTime;
@@ -17,7 +18,7 @@ public class CarePlanMapper {
         episodeofcareDto.setUuid(episodeOfCare.getIdElement().toUnqualifiedVersionless().getIdPart());
         episodeofcareDto.setStatus( mapEpisodeOfCareStatus(episodeOfCare.getStatus()) );
         episodeofcareDto.setStart( toOffsetDateTime(episodeOfCare.getPeriod().getStart()) );
-        episodeofcareDto.setEnd( toOffsetDateTime(episodeOfCare.getPeriod().getStart()) );
+        episodeofcareDto.setEnd( toOffsetDateTime(episodeOfCare.getPeriod().getEnd()) );
         episodeofcareDto.setPatientId(episodeOfCare.getPatient().getReferenceElement().toUnqualifiedVersionless().getIdPart());
 
         return episodeofcareDto;
@@ -33,6 +34,19 @@ public class CarePlanMapper {
             case CANCELLED -> EpisodeofcareDto.StatusEnum.CANCELLED;
             case ENTEREDINERROR -> EpisodeofcareDto.StatusEnum.ENTERED_IN_ERROR;
             case NULL -> null;
+        };
+    }
+
+    public static EpisodeOfCare.EpisodeOfCareStatus mapEpisodeOfCareStatus(EpisodeOfCareStatusDto status) {
+        return switch (status) {
+            case ACTIVE -> EpisodeOfCare.EpisodeOfCareStatus.ACTIVE;
+            case PLANNED -> EpisodeOfCare.EpisodeOfCareStatus.PLANNED;
+            case ONHOLD -> EpisodeOfCare.EpisodeOfCareStatus.ONHOLD;
+            case FINISHED -> EpisodeOfCare.EpisodeOfCareStatus.FINISHED;
+            case WAITLIST -> EpisodeOfCare.EpisodeOfCareStatus.WAITLIST;
+            case CANCELLED -> EpisodeOfCare.EpisodeOfCareStatus.CANCELLED;
+            case ENTERED_IN_ERROR -> EpisodeOfCare.EpisodeOfCareStatus.ENTEREDINERROR;
+            default -> EpisodeOfCare.EpisodeOfCareStatus.NULL;
         };
 
     }
