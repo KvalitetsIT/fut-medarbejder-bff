@@ -19,7 +19,6 @@ public class OrganizationController implements OrganizationApi {
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);
 
-
     public OrganizationController(OrganizationServiceImpl organizationService) {
         this.organizationService = organizationService;
     }
@@ -61,6 +60,19 @@ public class OrganizationController implements OrganizationApi {
                     "Getting the Patients for the CareTeam was not possible");
         }
         return ResponseEntity.ok(patients);
+    }
+
+    @Override
+    public ResponseEntity<List<CareTeamDto>> v1ParticipantIdCareteamsGet(Integer participantId) {
+        List<CareTeamDto> careTeams = null;
+        try {
+            careTeams = organizationService.getCareTeams(participantId);
+        } catch (Exception e) {
+            logger.error(e.toString());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Getting the CareTeam was not possible");
+        }
+        return ResponseEntity.ok(careTeams);
     }
 
 }

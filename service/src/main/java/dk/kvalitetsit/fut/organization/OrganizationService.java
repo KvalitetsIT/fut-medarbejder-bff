@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface OrganizationService {
     List<CareTeamDto> getCareTeams() throws Exception;
+    List<CareTeamDto> getCareTeams(int participantId) throws Exception;
     CareTeamDto getCareTeam(String id) throws Exception;
     List<PatientDto> getPatientsForCareTeam() throws Exception;
 }

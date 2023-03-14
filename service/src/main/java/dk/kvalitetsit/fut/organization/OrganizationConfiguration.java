@@ -22,14 +22,12 @@ public class OrganizationConfiguration implements WebMvcConfigurer {
     private String carePlanServiceUrl;
 
     @Bean
-    public OrganizationServiceImpl organizationService(@Autowired PatientService patientService,
-                                                       @Autowired AuthService authService,
+    public OrganizationServiceImpl organizationService(@Autowired AuthService authService,
                                                        @Autowired FhirContext fhirContext) {
         IGenericClient fhirClient = FhirContext.forR4().newRestfulGenericClient(organizationServiceUrl);
         return new OrganizationServiceImpl(fhirContext,
                 organizationServiceUrl,
                 carePlanServiceUrl,
-                patientService,
                 authService);
     }
 

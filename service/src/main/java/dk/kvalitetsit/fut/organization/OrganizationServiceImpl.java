@@ -31,17 +31,14 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final String organizationServiceUrl;
     private final String carePlanServiceUrl;
     private final AuthService authService;
-    private final PatientService patientService;
 
     public OrganizationServiceImpl(FhirContext fhirContext,
                                    String organizationServiceUrl,
                                    String carePlanServiceUrl,
-                                   PatientService patientService,
                                    AuthService authService) {
         this.fhirContext = fhirContext;
         this.organizationServiceUrl = organizationServiceUrl;
         this.carePlanServiceUrl = carePlanServiceUrl;
-        this.patientService = patientService;
         this.authService = authService;
     }
 
@@ -54,6 +51,24 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .search()
                 .forResource(CareTeam.class)
                 .returnBundle(Bundle.class)
+                .execute();
+
+        return result.getEntry().stream()
+                .map(bundleEntryComponent -> (CareTeam) bundleEntryComponent.getResource())
+                .map(OrganizationMapper::mapCareTeam)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CareTeamDto> getCareTeams(int participantId) throws Exception {
+        AuthService.Token token = authService.getToken();
+        IGenericClient client = getFhirClient(organizationServiceUrl, token);
+
+        Bundle result = client
+                .search()
+                .forResource(CareTeam.class)
+                .returnBundle(Bundle.class)
+                .where(CareTeam.PARTICIPANT.hasId(participantId+""))
                 .execute();
 
         return result.getEntry().stream()
@@ -79,7 +94,6 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         // Find et CareTeam til context
         UserInfoDto userInfo = authService.getUserInfo(token.accessToken());
-        logger.info("user_id " + userInfo.getUserId());
         ContextDto context = authService.getContext(token.accessToken());
 
         // Switch context (CareTeam)
