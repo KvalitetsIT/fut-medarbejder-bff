@@ -27,6 +27,8 @@ public class AuthService {
         this.authContextUrl = authContextUrl;
     }
 
+    // TODO: Misvisende navngivning:
+    // careTeamId er faktisk en resource URL...
     private Token refreshToken(String refreshToken, String careTeamId, String episodeOfCareId, String patientId) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
@@ -163,7 +165,7 @@ public class AuthService {
         ContextDto dto = new ContextDto();
         dto.setCareTeams(careTeams.stream().map((careteam -> {
                 CareTeamDto d = new CareTeamDto();
-                d.setUuid(careteam.get("id"));
+                d.setId(careteam.get("id"));
                 return d;
         })).toList());
 

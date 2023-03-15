@@ -23,13 +23,15 @@ import java.util.List;
 @Configuration
 public class PatientConfiguration implements WebMvcConfigurer {
 
+    @Value("${organization.service.url}")
+    private String organizationServiceUrl;
+
     @Value("${patient.service.url}")
     private String patientServiceUrl;
 
     @Bean
     public PatientServiceImpl patientService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
-        IGenericClient fhirClient = FhirContext.forR4().newRestfulGenericClient(patientServiceUrl);
-        return new PatientServiceImpl(fhirContext, patientServiceUrl, authService);
+        return new PatientServiceImpl(fhirContext, patientServiceUrl, organizationServiceUrl, authService);
     }
 
 }

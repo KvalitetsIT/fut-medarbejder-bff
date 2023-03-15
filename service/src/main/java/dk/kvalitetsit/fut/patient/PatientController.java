@@ -32,6 +32,7 @@ public class PatientController implements PatientsApi {
             PatientDto patient = patientService.createPatient(createPatient);
             return ResponseEntity.ok(patient);
         } catch (Exception e) {
+            logger.error(e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Creating the patient was not possible");
         }
     }
@@ -44,12 +45,14 @@ public class PatientController implements PatientsApi {
     }
 
     @Override
-    public ResponseEntity<PatientDto> v1PatientsIdGet(String id) {
+    public ResponseEntity<PatientDto> v1PatientsIdGet(String patientId, String careTeamId) {
         try {
-            PatientDto patient = patientService.getPatient(id);
+            PatientDto patient = patientService.getPatient(careTeamId, patientId);
             return ResponseEntity.ok(patient);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Removing the patient was not possible");
+            logger.error(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Getting the patient was not possible");
         }
     }
+
 }

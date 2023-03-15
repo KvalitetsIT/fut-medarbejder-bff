@@ -6,7 +6,7 @@ import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.IQuery;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import dk.kvalitetsit.fut.auth.AuthService;
+import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Resource;
@@ -16,24 +16,51 @@ import org.openapitools.model.PatientDto;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import dk.kvalitetsit.fut.auth.AuthService;
+import dk.kvalitetsit.fut.configuration.FhirLoggingInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PatientServiceImpl implements PatientService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PatientServiceImpl.class);
     private final Map<String, PatientDto> patients = new HashMap<>();
     private FhirContext fhirContext;
     private String patientServiceUrl;
+    private String organizationServiceUrl;
     private AuthService authService;
 
-    public PatientServiceImpl(FhirContext fhirContext, String patientServiceUrl, AuthService authService) {
+    public PatientServiceImpl(FhirContext fhirContext,
+                              String patientServiceUrl,
+                              String organizationServiceUrl,
+                              AuthService authService) {
         this.fhirContext = fhirContext;
         this.patientServiceUrl = patientServiceUrl;
+        this.organizationServiceUrl = organizationServiceUrl;
         this.authService = authService;
     }
 
     @Override
-    public PatientDto getPatient(String uuid) throws Exception {
-        boolean patientIsMissing = !this.patients.containsKey(uuid);
-        if(patientIsMissing) throw new Exception("Patient not found");
-        return patients.get(uuid);
+    public PatientDto getPatient(String careTeamId, String patientId) throws JsonProcessingException {
+        String careTeamResource = organizationServiceUrl + "CareTeam/" + careTeamId;
+
+        AuthService.Token token = authService.getToken();
+        token = authService.refreshTokenWithCareTeamAndPatientContext(
+                token, careTeamResource, patientId);
+
+        IGenericClient client = getFhirClient(token);
+        try {
+            Patient patient = client.read().resource(Patient.class).withId(patientId).execute();
+            return PatientMapper.mapPatient(patient);
+        } catch (Exception e) {
+            logger.info(e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public PatientDto getPatient(String patientId) throws JsonProcessingException {
+        throw new NotImplementedException();
     }
 
     @Override
@@ -46,7 +73,12 @@ public class PatientServiceImpl implements PatientService {
             criteria.add(Patient.FAMILY.matches().value(family));
         }
 
-        List<Patient> result = lookupByCriteria(Patient.class, criteria);
+        List<Patient> result = null;
+        try {
+            result = lookupByCriteria(Patient.class, criteria);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         return result.stream()
                 .map(patient -> PatientMapper.mapPatient(patient))
@@ -54,19 +86,19 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public void removePatient(String uuid) throws Exception {
-        getPatient(uuid);
-        patients.remove(uuid);
+    public void removePatient(String uuid) {
+        throw new NotImplementedException();
     }
 
     @Override
     public PatientDto createPatient(CreatePatientDto patient) {
-
         return constructPatient(patient);
     }
 
-    private <T extends Resource> List<T> lookupByCriteria(Class<T> resourceClass, List<ICriterion> criteria) {
-        IGenericClient client = getFhirClient();
+    private <T extends Resource> List<T> lookupByCriteria(Class<T> resourceClass, List<ICriterion> criteria)
+            throws JsonProcessingException {
+        AuthService.Token token = authService.getToken();
+        IGenericClient client = getFhirClient(token);
 
         IQuery<Bundle> query = client
                 .search()
@@ -87,16 +119,14 @@ public class PatientServiceImpl implements PatientService {
                 .collect(Collectors.toList());
     }
 
-    private IGenericClient getFhirClient() {
-        BearerTokenAuthInterceptor authInterceptor = null;
-        try {
-            authInterceptor = new BearerTokenAuthInterceptor( authService.getToken().accessToken() );
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
+    private IGenericClient getFhirClient(AuthService.Token token) {
         IGenericClient client = fhirContext.newRestfulGenericClient(patientServiceUrl);
+        FhirLoggingInterceptor logInt = new FhirLoggingInterceptor(logger);
+        client.registerInterceptor(logInt);
+
+        BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(token.accessToken());
         client.registerInterceptor(authInterceptor);
+
         return client;
     }
 
@@ -109,6 +139,5 @@ public class PatientServiceImpl implements PatientService {
 
         return patient;
     }
-
 
 }
