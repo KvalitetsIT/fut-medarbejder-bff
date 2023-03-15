@@ -4,6 +4,7 @@ services:
     ports:
       - 3000:80
     environment:
+      # defaults to http://localhost:8080/v1/, but can point to other bff environments
       - REACT_APP_API_BASEURL=http://localhost:8080/v1/
 
 
@@ -14,6 +15,6 @@ services:
       - 5005:5005
     environment:
       # defaults to devenvcgi, but can point to other eHealth environments
-      #- ehealth.environment=devenvcgi
+      - ehealth.environment=devenvcgi
 
       - JVM_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
