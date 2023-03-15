@@ -10,7 +10,7 @@ public class OrganizationMapper {
 
     public static CareTeamDto mapCareTeam(CareTeam careTeam) {
         CareTeamDto dto = new CareTeamDto();
-        dto.setUuid(careTeam.getIdElement().toUnqualifiedVersionless().getIdPart());
+        dto.setId(careTeam.getIdElement().toUnqualifiedVersionless().getIdPart());
         dto.setName(careTeam.getName());
         dto.setStatus(careTeam.getStatus().name());
 

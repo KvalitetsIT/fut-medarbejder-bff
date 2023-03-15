@@ -56,11 +56,7 @@ public class PlanDefinitionServiceImpl implements PlanDefinitionService {
     private IGenericClient getFhirClient() {
         IGenericClient client = null;
         AuthService.Token token = null;
-        try {
-            token = authService.getToken();
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        token = authService.getToken();
         BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(token.accessToken());
 
         client = fhirContext.newRestfulGenericClient(fhirServiceEndpoint);

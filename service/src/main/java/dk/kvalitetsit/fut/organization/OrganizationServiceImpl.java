@@ -86,7 +86,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         ContextDto context = authService.getContext(token);
 
         // Switch context (CareTeam)
-        String careTeamId = context.getCareTeams().get(0).getUuid();
+        String careTeamId = context.getCareTeams().get(0).getId();
         token = authService.refreshTokenWithCareTeamContext(token, careTeamId);
         IGenericClient client = getFhirClient(carePlanServiceUrl, token);
 

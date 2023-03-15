@@ -6,28 +6,53 @@ import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.IQuery;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import dk.kvalitetsit.fut.auth.AuthService;
 import org.hl7.fhir.r4.model.*;
+
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Resource;
+
 import org.openapitools.model.PatientDto;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PatientServiceImpl implements PatientService {
+import dk.kvalitetsit.fut.configuration.FhirLoggingInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class PatientServiceImpl implements PatientService {
+    private static final Logger logger = LoggerFactory.getLogger(PatientServiceImpl.class);
     private FhirContext fhirContext;
-    private String fhirServiceEndpoint;
+    private String patientServiceUrl;
+    private String organizationServiceUrl;
     private AuthService authService;
 
-    public PatientServiceImpl(FhirContext fhirContext, String fhirServiceEndpoint, AuthService authService) {
+    public PatientServiceImpl(FhirContext fhirContext, String patientServiceUrl, String organizationServiceUrl, AuthService authService) {
         this.fhirContext = fhirContext;
-        this.fhirServiceEndpoint = fhirServiceEndpoint;
+        this.patientServiceUrl = patientServiceUrl;
+        this.organizationServiceUrl = organizationServiceUrl;
         this.authService = authService;
     }
 
     @Override
-    public PatientDto getPatient(String patientId) {
+    public PatientDto getPatient(String patientId, String careTeamId) throws JsonProcessingException {
+        String careTeamResource = organizationServiceUrl + "CareTeam/" + careTeamId;
+
+        AuthService.Token token = authService.getToken();
+        token = authService.refreshTokenWithCareTeamAndPatientContext(
+                token, careTeamResource, patientId);
+
+        IGenericClient client = getFhirClient(token);
+        try {
+            Patient patient = client.read().resource(Patient.class).withId(patientId).execute();
+            return PatientMapper.mapPatient(patient);
+        } catch (Exception e) {
+            logger.info(e.getMessage());
+        }
         return null;
     }
 
@@ -38,7 +63,7 @@ public class PatientServiceImpl implements PatientService {
                 .setName("crn")
                 .setValue(new Identifier().setSystem("urn:oid:1.2.208.176.1.2").setValue(cpr));
 
-        IGenericClient client = getFhirClient();
+        IGenericClient client = getFhirClient(authService.getToken());
         Patient patient = client.operation()
                 .onType(Patient.class)
                 .named("$createPatient")
@@ -60,7 +85,8 @@ public class PatientServiceImpl implements PatientService {
             criteria.add(Patient.FAMILY.matches().value(family));
         }
 
-        List<Patient> result = lookupByCriteria(Patient.class, criteria);
+        List<Patient> result = null;
+        result = lookupByCriteria(Patient.class, criteria);
 
         return result.stream()
                 .map(patient -> PatientMapper.mapPatient(patient))
@@ -68,8 +94,7 @@ public class PatientServiceImpl implements PatientService {
     }
 
     private <T extends Resource> List<T> lookupByCriteria(Class<T> resourceClass, List<ICriterion> criteria) {
-        IGenericClient client = getFhirClient();
-
+        IGenericClient client = getFhirClient(authService.getToken());
         IQuery<Bundle> query = client
                 .search()
                 .forResource(resourceClass)
@@ -89,15 +114,11 @@ public class PatientServiceImpl implements PatientService {
                 .collect(Collectors.toList());
     }
 
-    private IGenericClient getFhirClient() {
-        BearerTokenAuthInterceptor authInterceptor = null;
-        try {
-            authInterceptor = new BearerTokenAuthInterceptor( authService.getToken().accessToken() );
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        IGenericClient client = fhirContext.newRestfulGenericClient(fhirServiceEndpoint);
+    private IGenericClient getFhirClient(AuthService.Token token) {
+        IGenericClient client = fhirContext.newRestfulGenericClient(patientServiceUrl);
+        FhirLoggingInterceptor logInt = new FhirLoggingInterceptor(logger);
+        BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(token.accessToken());
+        client.registerInterceptor(logInt);
         client.registerInterceptor(authInterceptor);
         return client;
     }

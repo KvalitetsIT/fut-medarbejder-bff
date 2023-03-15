@@ -1,5 +1,6 @@
 package dk.kvalitetsit.fut.patient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.openapitools.api.PatientApi;
 import org.openapitools.model.CreatePatientDto;
 import org.openapitools.model.PatientDto;
@@ -14,16 +15,12 @@ import java.util.List;
 
 @RestController
 public class PatientController implements PatientApi {
-
     private final PatientService patientService;
-
     private static final Logger logger = LoggerFactory.getLogger(PatientController.class);
-
 
     public PatientController(PatientService patientService) {
         this.patientService = patientService;
     }
-
 
     @Override
     public ResponseEntity<List<PatientDto>> v1GetPatients(String given, String family) {
@@ -32,18 +29,21 @@ public class PatientController implements PatientApi {
     }
 
     @Override
-    public ResponseEntity<PatientDto> v1GetPatient(String patientId) {
-        PatientDto patientDto = patientService.getPatient(patientId);
+    public ResponseEntity<PatientDto> v1GetPatient(String patientId, String careTeamId) {
+        PatientDto patientDto = null;
+        try {
+            patientDto = patientService.getPatient(patientId, careTeamId);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return ResponseEntity.ok(patientDto);
     }
 
     @Override
     public ResponseEntity<PatientDto> v1PostPatient(CreatePatientDto createPatientDto) {
         String cpr = createPatientDto.getCpr();
-
         String patientId = patientService.createPatient(cpr);
         URI location = URI.create(ServletUriComponentsBuilder.fromCurrentRequestUri().path("/" + patientId).build().toString());
         return ResponseEntity.created(location).build();
-
     }
 }

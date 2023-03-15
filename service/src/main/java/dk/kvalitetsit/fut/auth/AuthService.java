@@ -27,6 +27,8 @@ public class AuthService {
         this.authContextUrl = authContextUrl;
     }
 
+    // TODO: Misvisende navngivning:
+    // careTeamId er faktisk en resource URL...
     private Token refreshToken(String refreshToken, String careTeamId, String episodeOfCareId, String patientId) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
@@ -48,6 +50,7 @@ public class AuthService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(authTokenUrl, request, String.class);
+
         ObjectMapper mapper = new ObjectMapper();
         Map<Object, String> map2 = mapper.readValue(response.getBody(), Map.class);
 
@@ -82,8 +85,12 @@ public class AuthService {
         return new Token(map2.get("access_token"), map2.get("refresh_token"));
     }
 
-    public Token getToken() throws JsonProcessingException {
-        return this.createToken(USERNAME, PASSWORD, null, null);
+    public Token getToken() {
+        try {
+            return this.createToken(USERNAME, PASSWORD, null, null);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Token getToken(String username, String password) throws JsonProcessingException {
@@ -109,7 +116,6 @@ public class AuthService {
     public Token refreshTokenWithCareTeamAndPatientContext(Token token, String careTeamId, String patientId) throws JsonProcessingException {
         return refreshToken(token.refreshToken(), careTeamId, null, patientId);
     }
-
 
     public UserInfoDto getUserInfo(Token token) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
@@ -163,7 +169,7 @@ public class AuthService {
         ContextDto dto = new ContextDto();
         dto.setCareTeams(careTeams.stream().map((careteam -> {
                 CareTeamDto d = new CareTeamDto();
-                d.setUuid(careteam.get("id"));
+                d.setId(careteam.get("id"));
                 return d;
         })).toList());
 

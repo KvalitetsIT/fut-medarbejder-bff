@@ -222,11 +222,7 @@ public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
     }
 
     private IGenericClient getFhirClient() {
-        try {
-            return this.getFhirClient(authService.getToken());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return this.getFhirClient(authService.getToken());
     }
     private IGenericClient getFhirClientWithPatientContext(String patientUrl) {
         AuthService.Token token = null;
@@ -234,7 +230,7 @@ public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
             token = authService.getToken();
 
             ContextDto context = authService.getContext(token);
-            String careTeamId = context.getCareTeams().get(0).getUuid();
+            String careTeamId = context.getCareTeams().get(0).getId();
 
             token = authService.refreshTokenWithCareTeamAndPatientContext(token, careTeamId, patientUrl);
 
@@ -252,7 +248,7 @@ public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
             token = authService.getToken();
 
             ContextDto context = authService.getContext(token);
-            String careTeamId = context.getCareTeams().get(0).getUuid();
+            String careTeamId = context.getCareTeams().get(0).getId();
 
             token = authService.refreshTokenWithCareTeamAndEpisodeOfCareContext(token, careTeamId, episodeOfCareUrl);
 

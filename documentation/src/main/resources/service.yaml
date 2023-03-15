@@ -105,6 +105,12 @@ paths:
         schema:
           type: string
         description: the id corresponding to the patient of interest
+      - in: query
+        name: careTeamId
+        required: false
+        schema:
+          type: string
+        description: the id of the CareTeam to put in the context
     get:
       tags:
         - Patient
@@ -546,10 +552,9 @@ components:
     CareTeam:
       type: object
       properties:
-        uuid:
-          description: An uuid identifying the careteam
+        id:
+          description: An id identifying the careteam
           type: string
-          example: "123e4567-e89b-12d3-a456-426614174000"
         name:
           description: Name of the careteam
           type: string
