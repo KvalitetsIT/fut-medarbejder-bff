@@ -1,6 +1,19 @@
 services:
-  web:
-    image: kvalitetsit/fut-medarbejder-web:f67fa1b85d4cb50fa27782294c5d7cec2fdc420a
+  fut-medarbejder-web:
+    image: kvalitetsit/fut-medarbejder-web:20b48200c9fb9817ec79187132527ffefde07a09
+    ports:
+      - 3000:80
+    environment:
+      - REACT_APP_API_BASEURL=http://localhost:8080/v1/
 
-  bff:
-    image:
+
+  fut-medarbejder-bff:
+    image: kvalitetsit/fut-medarbejder-bff:d5d1097fbac3a252ec65069a8437d205bfa07614
+    ports:
+      - 8080:8080
+      - 5005:5005
+    environment:
+      # defaults to devenvcgi, but can point to other eHealth environments
+      #- ehealth.environment=devenvcgi
+
+      - JVM_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
