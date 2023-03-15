@@ -430,26 +430,26 @@ paths:
         schema:
           type: string
         description: the id corresponding to the episode of care to operate on
-    get:
-      tags:
-        - CarePlan
-      description: Request a list of careplans for an episode of care
-      summary: get careplans
-      operationId: v1GetCarePlansForEpisodeOfCare
-      parameters:
-        - in: query
-          name: careTeamId
-          description: an id identifying the careteam responsible for the careplan
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/careplans'
+#    get:
+#      tags:
+#        - CarePlan
+#      description: Request a list of careplans for an episode of care
+#      summary: get careplans
+#      operationId: v1GetCarePlansForEpisodeOfCare
+#      parameters:
+#        - in: query
+#          name: careTeamId
+#          description: an id identifying the careteam responsible for the careplan
+#          required: true
+#          schema:
+#            type: string
+#      responses:
+#        '200':
+#          description: Ok
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/careplans'
     post:
       tags:
         - CarePlan
