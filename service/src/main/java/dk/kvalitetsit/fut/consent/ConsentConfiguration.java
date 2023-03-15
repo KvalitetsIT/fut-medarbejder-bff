@@ -17,10 +17,7 @@ public class ConsentConfiguration implements WebMvcConfigurer {
     private String fhirServiceEndpoint;
 
     @Bean
-    public ConsentServiceImpl consentService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
+    public ConsentService consentService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
         return new ConsentServiceImpl(fhirContext, fhirServiceEndpoint, authService);
     }
-
-    @Value("${ALLOWED_ORIGINS:http://localhost:3000}")
-    private List<String> allowedOrigins;
 }

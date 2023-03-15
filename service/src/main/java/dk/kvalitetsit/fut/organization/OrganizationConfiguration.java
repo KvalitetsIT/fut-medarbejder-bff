@@ -30,7 +30,4 @@ public class OrganizationConfiguration implements WebMvcConfigurer {
                 carePlanServiceUrl,
                 authService);
     }
-
-    @Value("${ALLOWED_ORIGINS:http://localhost:3000}")
-    private List<String> allowedOrigins;
 }

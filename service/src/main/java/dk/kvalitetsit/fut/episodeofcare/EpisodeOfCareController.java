@@ -18,12 +18,12 @@ import java.util.List;
 @RestController
 public class EpisodeOfCareController implements EpisodeOfCareApi {
 
-    private final EpisodeOfCareServiceImpl episodeOfCareService;
+    private final EpisodeOfCareService episodeOfCareService;
 
     private static final Logger logger = LoggerFactory.getLogger(EpisodeOfCareController.class);
 
 
-    public EpisodeOfCareController(EpisodeOfCareServiceImpl episodeOfCareService) {
+    public EpisodeOfCareController(EpisodeOfCareService episodeOfCareService) {
         this.episodeOfCareService = episodeOfCareService;
     }
 

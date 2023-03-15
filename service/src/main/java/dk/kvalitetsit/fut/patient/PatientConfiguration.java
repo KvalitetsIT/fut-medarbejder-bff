@@ -19,5 +19,4 @@ public class PatientConfiguration implements WebMvcConfigurer {
     public PatientServiceImpl patientService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
         return new PatientServiceImpl(fhirContext, patientServiceUrl, organizationServiceUrl, authService);
     }
-
 }

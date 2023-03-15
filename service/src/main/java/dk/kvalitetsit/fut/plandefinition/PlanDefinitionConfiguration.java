@@ -17,10 +17,7 @@ public class PlanDefinitionConfiguration implements WebMvcConfigurer {
     private String fhirServiceEndpoint;
 
     @Bean
-    public PlanDefinitionServiceImpl planDefinitionService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
+    public PlanDefinitionService planDefinitionService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
         return new PlanDefinitionServiceImpl(fhirContext, fhirServiceEndpoint, authService);
     }
-
-    @Value("${ALLOWED_ORIGINS:http://localhost:3000}")
-    private List<String> allowedOrigins;
 }

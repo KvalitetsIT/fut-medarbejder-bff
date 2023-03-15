@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.List;
-
 @Configuration
 public class CarePlanConfiguration implements WebMvcConfigurer {
 
@@ -17,10 +15,7 @@ public class CarePlanConfiguration implements WebMvcConfigurer {
     private String fhirServiceEndpoint;
 
     @Bean
-    public CarePlanServiceImpl carePlanService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
+    public CarePlanService carePlanService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
         return new CarePlanServiceImpl(fhirContext, fhirServiceEndpoint, authService);
     }
-
-    @Value("${ALLOWED_ORIGINS:http://localhost:3000}")
-    private List<String> allowedOrigins;
 }
