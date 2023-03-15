@@ -1,0 +1,6 @@
+services:
+  web:
+    image: kvalitetsit/fut-medarbejder-web:f67fa1b85d4cb50fa27782294c5d7cec2fdc420a
+
+  bff:
+    image:
