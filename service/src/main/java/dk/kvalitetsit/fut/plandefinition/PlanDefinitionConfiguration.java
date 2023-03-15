@@ -13,12 +13,12 @@ import java.util.List;
 @Configuration
 public class PlanDefinitionConfiguration implements WebMvcConfigurer {
 
-    @Value("${plandefinition.service.url}")
-    private String planDefinitionServiceUrl;
+    @Value("${plandefinition.fhir.service.endpoint}")
+    private String fhirServiceEndpoint;
 
     @Bean
     public PlanDefinitionServiceImpl planDefinitionService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
-        return new PlanDefinitionServiceImpl(fhirContext, planDefinitionServiceUrl, authService);
+        return new PlanDefinitionServiceImpl(fhirContext, fhirServiceEndpoint, authService);
     }
 
     @Value("${ALLOWED_ORIGINS:http://localhost:3000}")

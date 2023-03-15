@@ -48,32 +48,12 @@ paths:
                 $ref: '#/components/schemas/helloResponse'
 
   /v1/patients:
-    post:
-      tags:
-        - patients
-      summary: Create patient
-      description: Create a new patient
-      requestBody:
-        description: A new patient.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/createPatient'
-      responses:
-        '201':
-          description: The patient is created.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/patient'
-        '401':
-          $ref: '#/components/responses/401'
     get:
       tags:
-        - patients
-      summary: get patients
+        - Patient
       description: Request a list of patients.
+      summary: Search for patients
+      operationId: v1GetPatients
       parameters:
         - in: query
           name: given
@@ -94,6 +74,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/patients'
+    post:
+      tags:
+        - Patient
+      description: Create a new patient
+      summary: Create patient
+      operationId: v1PostPatient
+      requestBody:
+        description: A new patient.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createPatient'
+      responses:
+        '201':
+          description: The patient is created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patient'
+        '401':
+          $ref: '#/components/responses/401'
+
+  /v1/patients/{patientId}:
+    parameters:
+      - in: path
+        name: patientId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the patient of interest
+    get:
+      tags:
+        - Patient
+      description: Request a patient by id.
+      summary: get patient
+      operationId: v1GetPatient
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patient'
 
   /v1/participant/{id}/careteams:
     get:
@@ -151,6 +175,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/patients'
 
+  /v1/careteams/{careTeamId}/careplans:
+    get:
+      tags:
+        - CarePlan
+      description: Request a list of careplans for a CareTeam
+      summary: get careplans
+      operationId: v1GetCarePlansForCareTeam
+      parameters:
+        - in: path
+          name: careTeamId
+          description: an id identifying the careteam responsible for the careplan
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/careplans'
+
+  /v1/careteams/{careTeamId}/episodeofcares:
+    get:
+      tags:
+        - EpisodeOfCare
+      description: Returns a list of EpisodeOfCare for the CareTeam.
+      summary: Find EpisodeOfCares by CareTeam id.
+      operationId: v1GetEpisodeOfCaresForCareTeam
+      parameters:
+        - in: path
+          name: careTeamId
+          description: an id identifying the careteam responsible for the episode of cares
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/episodeofcares'
+
+
   /v1/careteams/{id}:
     parameters:
       - in: path
@@ -172,74 +241,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/CareTeam'
 
-  /v1/patients/{id}:
-    parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        description: the uuid corresponding to the patient of interest
+  /v1/episodeofcares:
     get:
       tags:
-        - patients
-      summary: get patient
-      description: Request a patient by id.
+        - EpisodeOfCare
+      description: Returns a list of EpisodeOfCare for the CareTeam.
+      summary: Find EpisodeOfCares by CareTeam id.
+      operationId: v1GetEpisodeOfCares
+      parameters:
+        - in: query
+          name: careTeamId
+          description: an uuid identifying the careteam responsible for the episode of cares
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/patient'
-#    delete:
-#      tags:
-#        - patients
-#      summary: delete patient
-#      description: Delete a patient by id.
-#      parameters:
-#        - in: path
-#          name: id
-#          required: true
-#          schema:
-#            type: string
-#          description: the uuid corresponding to the patient that is to be deleted
-#      responses:
-#        '200':
-#          description: Ok
-#    put:
-#      tags:
-#        - patients
-#      summary: update patient
-#      description: Update a patient by id.
-#      parameters:
-#        - in: path
-#          name: id
-#          required: true
-#          schema:
-#            type: string
-#          description: the uuid corresponding to the patient that is to be deleted
-#      requestBody:
-#        description: A patient
-#        required: true
-#        content:
-#          application/json:
-#            schema:
-#              $ref: '#/components/schemas/createPatient'
-#      responses:
-#        '200':
-#          description: Ok
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/patient'
-
-  /v1/episodeofcares:
+                $ref: '#/components/schemas/episodeofcares'
     post:
       tags:
-        - EpisodeOfCares
-      summary: Create patient
+        - EpisodeOfCare
       description: Create a new Episode Of Care
+      summary: Create patient
+      operationId: v1PostEpisodeOfCare
       requestBody:
         description: A new episode of care.
         required: true
@@ -257,39 +285,21 @@ paths:
                 format: uri
         '401':
           $ref: '#/components/responses/401'
-    get:
-      tags:
-        - EpisodeOfCares
-      summary: get episode of cares
-      description: Request a list of episode of cares.
-      parameters:
-        - in: query
-          name: careTeamId
-          description: an uuid identifying the careteam responsible for the episode of cares
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/episodeofcares'
 
-  /v1/episodeofcares/{id}:
+  /v1/episodeofcares/{episodeOfCareId}:
     parameters:
       - in: path
-        name: id
+        name: episodeOfCareId
         required: true
         schema:
           type: string
         description: the id corresponding to the episode of care to lookup
     get:
       tags:
-        - EpisodeOfCares
-      summary: get episode of cares
+        - EpisodeOfCare
       description: Request an episode of care by id.
+      summary: get episode of cares
+      operationId: v1GetEpisodeOfCare
       responses:
         '200':
           description: Ok
@@ -299,9 +309,10 @@ paths:
                 $ref: '#/components/schemas/episodeofcare'
     patch:
       tags:
-        - EpisodeOfCares
-      summary: update episode of care
+        - EpisodeOfCare
       description: Update an episode of care by id.
+      summary: update episode of care
+      operationId: v1PatchEpisodeOfCare
       requestBody:
         description: A new consent.
         required: true
@@ -316,10 +327,10 @@ paths:
           $ref: '#/components/responses/401'
 
 
-  /v1/episodeofcares/{id}/consent:
+  /v1/episodeofcares/{episodeOfCareId}/consents:
     parameters:
       - in: path
-        name: id
+        name: episodeOfCareId
         required: true
         schema:
           type: string
@@ -327,8 +338,9 @@ paths:
     get:
       tags:
         - Consent
-      summary: get consent for episode of care
       description: Request a consent for an episode of care identified by id.
+      summary: get consent for episode of care
+      operationId: v1GetConsentsForEpisodeOfCare
       responses:
         '200':
           description: Ok
@@ -339,8 +351,9 @@ paths:
     post:
       tags:
         - Consent
-      summary: Create consent
       description: Create a consent for a Patient to be enrolled in the episode of care identidied by id.
+      summary: Create consent
+      operationId: v1PostConsentForEpisodeOfCare
       requestBody:
         description: A new consent.
         required: true
@@ -359,7 +372,7 @@ paths:
         '401':
           $ref: '#/components/responses/401'
 
-  /v1/episodeofcares/{episodeOfCareId}/consent/{consentId}:
+  /v1/episodeofcares/{episodeOfCareId}/consents/{consentId}:
     parameters:
       - in: path
         name: episodeOfCareId
@@ -376,8 +389,9 @@ paths:
     get:
       tags:
         - Consent
-      summary: get a consent for episode of care
       description: Request a consent for an episode of care identified by id.
+      summary: get a consent for episode of care
+      operationId: v1GetConsentForEpisodeOfCare
       responses:
         '200':
           description: Ok
@@ -389,9 +403,10 @@ paths:
   /v1/plandefinitions:
     get:
       tags:
-        - PlanDefinitions
-      summary: get plandefinitions
+        - PlanDefinition
       description: Request a list of active plandefinitions.
+      summary: get plandefinitions
+      operationId: v1GetPlanDefinitions
       parameters:
         - in: query
           name: title
@@ -406,6 +421,88 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/plandefinitions'
+
+  /v1/episodeofcares/{episodeOfCareId}/careplans:
+    parameters:
+      - in: path
+        name: episodeOfCareId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the episode of care to operate on
+    get:
+      tags:
+        - CarePlan
+      description: Request a list of careplans for an episode of care
+      summary: get careplans
+      operationId: v1GetCarePlansForEpisodeOfCare
+      parameters:
+        - in: query
+          name: careTeamId
+          description: an id identifying the careteam responsible for the careplan
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/careplans'
+    post:
+      tags:
+        - CarePlan
+      description: Create a new careplan
+      summary: Create careplan
+      operationId: v1PostCarePlanForEpisodeOfCare
+      requestBody:
+        description: A new episode of care.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createCarePlan'
+      responses:
+        '201':
+          description: The CarePlan is created.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+        '401':
+          $ref: '#/components/responses/401'
+
+
+  /v1/episodeofcares/{episodeOfCareId}/careplans/{careplanId}:
+    parameters:
+      - in: path
+        name: episodeOfCareId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the episode of care to access specific careplan for
+      - in: path
+        name: careplanId
+        required: true
+        schema:
+          type: string
+        description:
+          the id corresponding to the careplan to lookup
+    get:
+      tags:
+        - CarePlan
+      description: Request a careplan.
+      summary: get careplan
+      operationId: v1GetCarePlanForEpisodeOfCare
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/careplan'
 
 components:
   responses:
@@ -485,10 +582,9 @@ components:
     patient:
       type: object
       properties:
-        uuid:
-          description: an uuid identifying the patient
+        id:
+          description: an id identifying the patient
           type: string
-          example: "123e4567-e89b-12d3-a456-426614174000"
         firstName:
           description: the patients firstname
           type: string
@@ -504,14 +600,9 @@ components:
     createPatient:
       type: object
       properties:
-        firstName:
-          description: the patients firstname
+        cpr:
+          description: the patients CPR
           type: string
-          example: "Joe"
-        lastName:
-          description: the patients lastname
-          type: string
-          example: "Dow"
 
     episodeofcares:
       type: array
@@ -649,6 +740,45 @@ components:
         clinicianTitle:
           description: Title for clinicians
           type: string
+
+    createCarePlan:
+      type: object
+      properties:
+        plandefinitionId:
+          description: id for plandefinition to apply
+          type: string
+
+    careplans:
+      type: array
+      items:
+        $ref: '#/components/schemas/careplan'
+
+    careplan:
+      type: object
+      properties:
+        id:
+          description: an id identifying the careplan
+          type: string
+        status:
+          description: status of careplan
+          type: string
+          enum: [ draft, active, on-hold, revoked, completed, entered-in-error, unknown ]
+        patientId:
+          description: id identifying the patient for this careplan
+          type: string
+        careTeamId:
+          description: id identifying the careteam for this careplan
+          type: string
+        start:
+          description: start date for this careplan
+          type: string
+          format: date-time
+        end:
+          description: end date for this careplan
+          type: string
+          format: date-time
+
+
 
     helloRequest:
       type: object

@@ -8,7 +8,7 @@ public class PatientMapper {
     public static PatientDto mapPatient(Patient patient) {
         PatientDto result = new PatientDto();
 
-        result.setUuid(patient.getIdElement().toUnqualifiedVersionless().getIdPart());
+        result.setId(patient.getIdElement().toUnqualifiedVersionless().getIdPart());
         result.setFirstName(patient.getNameFirstRep().getGivenAsSingleString());
         result.setLastName(patient.getNameFirstRep().getNameAsSingleString());
         result.setCpr(patient.getIdentifierFirstRep().getValue());

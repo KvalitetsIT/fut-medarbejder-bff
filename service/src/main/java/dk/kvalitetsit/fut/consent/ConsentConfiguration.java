@@ -1,4 +1,4 @@
-package dk.kvalitetsit.fut.careplan;
+package dk.kvalitetsit.fut.consent;
 
 import ca.uhn.fhir.context.FhirContext;
 import dk.kvalitetsit.fut.auth.AuthService;
@@ -11,14 +11,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.List;
 
 @Configuration
-public class CarePlanConfiguration implements WebMvcConfigurer {
+public class ConsentConfiguration implements WebMvcConfigurer {
 
-    @Value("${careplan.fhir.service.endpoint}")
+    @Value("${consent.fhir.service.endpoint}")
     private String fhirServiceEndpoint;
 
     @Bean
-    public CarePlanServiceImpl carePlanService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
-        return new CarePlanServiceImpl(fhirContext, fhirServiceEndpoint, authService);
+    public ConsentServiceImpl consentService(@Autowired AuthService authService, @Autowired FhirContext fhirContext) {
+        return new ConsentServiceImpl(fhirContext, fhirServiceEndpoint, authService);
     }
 
     @Value("${ALLOWED_ORIGINS:http://localhost:3000}")

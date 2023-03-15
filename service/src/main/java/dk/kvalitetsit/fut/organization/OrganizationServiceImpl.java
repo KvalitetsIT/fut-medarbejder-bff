@@ -104,7 +104,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         // Lav PatientDto'er
         list.forEach(carePlan -> {
             PatientDto patientDto = new PatientDto();
-            patientDto.setUuid(carePlan.getSubject().getReference());
+            patientDto.setId(carePlan.getSubject().getReferenceElement().toUnqualifiedVersionless().getIdPart());
             patients.add(patientDto);
         });
 

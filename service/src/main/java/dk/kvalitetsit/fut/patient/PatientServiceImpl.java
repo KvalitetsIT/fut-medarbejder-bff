@@ -7,37 +7,51 @@ import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.IQuery;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.kvalitetsit.fut.auth.AuthService;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Resource;
-import org.openapitools.model.CreatePatientDto;
+import org.hl7.fhir.r4.model.*;
 import org.openapitools.model.PatientDto;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class PatientServiceImpl implements PatientService {
 
-    private final Map<String, PatientDto> patients = new HashMap<>();
     private FhirContext fhirContext;
-    private String patientServiceUrl;
+    private String fhirServiceEndpoint;
     private AuthService authService;
 
-    public PatientServiceImpl(FhirContext fhirContext, String patientServiceUrl, AuthService authService) {
+    public PatientServiceImpl(FhirContext fhirContext, String fhirServiceEndpoint, AuthService authService) {
         this.fhirContext = fhirContext;
-        this.patientServiceUrl = patientServiceUrl;
+        this.fhirServiceEndpoint = fhirServiceEndpoint;
         this.authService = authService;
     }
 
     @Override
-    public PatientDto getPatient(String uuid) throws Exception {
-        boolean patientIsMissing = !this.patients.containsKey(uuid);
-        if(patientIsMissing) throw new Exception("Patient not found");
-        return patients.get(uuid);
+    public PatientDto getPatient(String patientId) {
+        return null;
     }
 
     @Override
-    public List<PatientDto> getPatients(String given, String family) {
+    public String createPatient(String cpr) {
+        Parameters parameters = new Parameters();
+        parameters.addParameter()
+                .setName("crn")
+                .setValue(new Identifier().setSystem("urn:oid:1.2.208.176.1.2").setValue(cpr));
+
+        IGenericClient client = getFhirClient();
+        Patient patient = client.operation()
+                .onType(Patient.class)
+                .named("$createPatient")
+                .withParameters(parameters)
+                .returnResourceType(Patient.class)
+                .execute();
+
+        return patient.getIdElement().toUnqualifiedVersionless().getIdPart();
+
+    }
+
+    @Override
+    public List<PatientDto> searchPatients(String given, String family) {
         List<ICriterion> criteria = new ArrayList<>();
         if (given != null) {
             criteria.add(Patient.GIVEN.matches().value(given));
@@ -51,18 +65,6 @@ public class PatientServiceImpl implements PatientService {
         return result.stream()
                 .map(patient -> PatientMapper.mapPatient(patient))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public void removePatient(String uuid) throws Exception {
-        getPatient(uuid);
-        patients.remove(uuid);
-    }
-
-    @Override
-    public PatientDto createPatient(CreatePatientDto patient) {
-
-        return constructPatient(patient);
     }
 
     private <T extends Resource> List<T> lookupByCriteria(Class<T> resourceClass, List<ICriterion> criteria) {
@@ -95,20 +97,8 @@ public class PatientServiceImpl implements PatientService {
             throw new RuntimeException(e);
         }
 
-        IGenericClient client = fhirContext.newRestfulGenericClient(patientServiceUrl);
+        IGenericClient client = fhirContext.newRestfulGenericClient(fhirServiceEndpoint);
         client.registerInterceptor(authInterceptor);
         return client;
     }
-
-    private PatientDto constructPatient(CreatePatientDto createPatient) {
-        PatientDto patient = new PatientDto();
-        patient.setUuid(UUID.randomUUID().toString());
-        patient.setFirstName(createPatient.getFirstName());
-        patient.setLastName(createPatient.getLastName());
-        patients.put(patient.getUuid(), patient);
-
-        return patient;
-    }
-
-
 }

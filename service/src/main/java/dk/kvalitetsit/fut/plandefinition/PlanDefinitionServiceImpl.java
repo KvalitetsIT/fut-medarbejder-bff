@@ -22,20 +22,21 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PlanDefinitionServiceImpl  {
+public class PlanDefinitionServiceImpl implements PlanDefinitionService {
     private static final Logger logger = LoggerFactory.getLogger(PlanDefinitionServiceImpl.class);
 
     private FhirContext fhirContext;
-    private String planDefinitionServiceUrl;
+    private String fhirServiceEndpoint;
     private AuthService authService;
 
-    public PlanDefinitionServiceImpl(FhirContext fhirContext, String planDefinitionServiceUrl, AuthService authService) {
+    public PlanDefinitionServiceImpl(FhirContext fhirContext, String fhirServiceEndpoint, AuthService authService) {
         this.fhirContext = fhirContext;
-        this.planDefinitionServiceUrl = planDefinitionServiceUrl;
+        this.fhirServiceEndpoint = fhirServiceEndpoint;
         this.authService = authService;
     }
 
 
+    @Override
     public List<PlandefinitionDto> getPlanDefinitions(String title) {
         IGenericClient client = getFhirClient();
 
@@ -62,7 +63,7 @@ public class PlanDefinitionServiceImpl  {
         }
         BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(token.accessToken());
 
-        client = fhirContext.newRestfulGenericClient(planDefinitionServiceUrl);
+        client = fhirContext.newRestfulGenericClient(fhirServiceEndpoint);
         client.registerInterceptor(authInterceptor);
 
         return client;

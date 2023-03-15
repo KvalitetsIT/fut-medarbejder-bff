@@ -15,10 +15,10 @@ import java.util.List;
 @Configuration
 public class OrganizationConfiguration implements WebMvcConfigurer {
 
-    @Value("${organization.service.url}")
+    @Value("${organization.fhir.service.endpoint}")
     private String organizationServiceUrl;
 
-    @Value("${careplan.service.url}")
+    @Value("${careplan.fhir.service.endpoint}")
     private String carePlanServiceUrl;
 
     @Bean
