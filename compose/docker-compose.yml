@@ -5,7 +5,8 @@ services:
       - 3000:80
     environment:
       # defaults to http://localhost:8080/v1/, but can point to other bff environments
-      - REACT_APP_API_BASEURL=http://fut-medarbejder-bff:8080/v1/
+      - REACT_APP_API_BASEURL=http://localhost:8080/v1/
+
 
   fut-medarbejder-bff:
     image: kvalitetsit/fut-medarbejder-bff:d5d1097fbac3a252ec65069a8437d205bfa07614
