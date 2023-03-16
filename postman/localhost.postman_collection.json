@@ -1,0 +1,421 @@
+{
+	"info": {
+		"_postman_id": "d6e83e31-e85e-4571-8bdd-4f385914cd6e",
+		"name": "localhost",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "find patienter",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/patients",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"patients"
+					],
+					"query": [
+						{
+							"key": "family",
+							"value": "Jør",
+							"disabled": true
+						},
+						{
+							"key": "given",
+							"value": "jula",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create patient",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"cpr\": \"1110109996\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/patients",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"patients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "episode of cares 1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/episodeofcares?careTeamId=135884",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"episodeofcares"
+					],
+					"query": [
+						{
+							"key": "careTeamId",
+							"value": "135884"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "episode of cares 2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/careteams/135884/episodeofcares",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"careteams",
+						"135884",
+						"episodeofcares"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "episode of care 3",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/episodeofcares/118621",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"episodeofcares",
+						"118621"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "episode of care",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"provenance\": \"http://ehealth.sundhed.dk/policy/dk/sundhedsloven\",\n    \"patientId\": \"258981\",\n    \"careTeamId\": \"135884\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/episodeofcares",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"episodeofcares"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "episode of care",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"active\",\n    \"end\": \"1971-01-01T01:00:01+01:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/episodeofcares/118621",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"episodeofcares",
+						"118621"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "consents for episode of care",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/episodeofcares/118621/consents",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"episodeofcares",
+						"118621",
+						"consents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "specific consent for episode of care",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/episodeofcares/118621/consents/120616",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"episodeofcares",
+						"118621",
+						"consents",
+						"120616"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "consent",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"category\": \"PITEOC\",\n    \"status\": \"active\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/episodeofcares/118621/consents",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"episodeofcares",
+						"118621",
+						"consents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "plandefinitions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/plandefinitions?title=kit",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"plandefinitions"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": "kit"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "careplans for care team",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/careteams/135884/careplans",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"careteams",
+						"135884",
+						"careplans"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "spedific careplan for care team",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/careteams/135884/careplans",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"careteams",
+						"135884",
+						"careplans"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "careplan for episode of care",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"plandefinitionId\": \"16857\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/episodeofcares/118621/careplans",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"episodeofcares",
+						"118621",
+						"careplans"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "careplans for episode of care",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/episodeofcares/118621/careplans",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"episodeofcares",
+						"118621",
+						"careplans"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "specific careplan for episode of care",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/episodeofcares/118621/careplans/120583",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"episodeofcares",
+						"118621",
+						"careplans",
+						"120583"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
