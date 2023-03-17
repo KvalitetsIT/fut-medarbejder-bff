@@ -205,6 +205,7 @@ public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
         IQuery<Bundle> query = client
                 .search()
                 .forResource(resourceClass)
+                .count(200) // Default is 20
                 .returnBundle(Bundle.class);
 
         if (!criteria.isEmpty()) {
