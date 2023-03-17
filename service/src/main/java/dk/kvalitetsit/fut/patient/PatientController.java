@@ -23,8 +23,13 @@ public class PatientController implements PatientApi {
     }
 
     @Override
-    public ResponseEntity<List<PatientDto>> v1GetPatients(String given, String family) {
-        List<PatientDto> patients = patientService.searchPatients(given, family);
+    public ResponseEntity<List<PatientDto>> v1GetPatients(String given, String family, String cpr) {
+        List<PatientDto> patients;
+        if (cpr != null) {
+            patients = patientService.searchPatient(cpr);
+        } else {
+            patients = patientService.searchPatients(given, family);
+        }
         return ResponseEntity.ok(patients);
     }
 

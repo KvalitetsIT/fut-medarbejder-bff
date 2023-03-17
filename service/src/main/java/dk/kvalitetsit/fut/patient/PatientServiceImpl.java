@@ -1,6 +1,7 @@
 package dk.kvalitetsit.fut.patient;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.api.SearchStyleEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.gclient.ICriterion;
@@ -72,7 +73,6 @@ public class PatientServiceImpl implements PatientService {
                 .execute();
 
         return patient.getIdElement().toUnqualifiedVersionless().getIdPart();
-
     }
 
     @Override
@@ -85,11 +85,28 @@ public class PatientServiceImpl implements PatientService {
             criteria.add(Patient.FAMILY.matches().value(family));
         }
 
-        List<Patient> result = null;
-        result = lookupByCriteria(Patient.class, criteria);
+        List<Patient> result = lookupByCriteria(Patient.class, criteria);
 
         return result.stream()
                 .map(patient -> PatientMapper.mapPatient(patient))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PatientDto> searchPatient(String cpr) {
+        IGenericClient client = getFhirClient(authService.getToken());
+
+        Bundle response = client
+                .search()
+                .forResource("Patient")
+                .where(Patient.IDENTIFIER.exactly().systemAndCode("urn:oid:1.2.208.176.1.2", cpr))
+                .usingStyle(SearchStyleEnum.POST)
+                .returnBundle(Bundle.class)
+                .execute();
+
+        return response.getEntry().stream()
+                .map(bundleEntryComponent -> (Patient)bundleEntryComponent.getResource())
+                .map(PatientMapper::mapPatient)
                 .collect(Collectors.toList());
     }
 

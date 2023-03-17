@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface PatientService {
     List<PatientDto> searchPatients(String given, String family);
+    List<PatientDto> searchPatient(String cpr);
     String createPatient(String cpr);
     PatientDto getPatient(String patientId, String careTeamId) throws JsonProcessingException;
 }
