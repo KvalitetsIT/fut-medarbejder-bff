@@ -84,7 +84,7 @@ public class CarePlanServiceImpl implements CarePlanService {
     }
 
     @Override
-    public void updateCarePlan(String episodeOfCareId, String careplanId, OffsetDateTime start, OffsetDateTime end, CareplanStatusDto status, String careTeamId) {
+    public void updateCarePlan(String episodeOfCareId, String careplanId, OffsetDateTime start, OffsetDateTime end, CareplanStatusDto status) {
         String episodeOfCareUrl = "https://careplan.devenvcgi.ehealth.sundhed.dk/fhir/EpisodeOfCare/"+episodeOfCareId;
 
         IGenericClient client = getFhirClientWithEpisodeOfCareContext(episodeOfCareUrl);
@@ -102,6 +102,18 @@ public class CarePlanServiceImpl implements CarePlanService {
         if (status != null) {
             CarePlan.CarePlanStatus newStatus = CarePlanMapper.mapCarePlanStatus(status);
             carePlan.setStatus(newStatus);
+
+            carePlan.getActivity().forEach(carePlanActivityComponent -> {
+                ServiceRequest serviceRequest = client.read()
+                        .resource(ServiceRequest.class)
+                        .withId(carePlanActivityComponent.getReference().getReferenceElement().toUnqualifiedVersionless())
+                        .execute();
+
+                serviceRequest.setStatus(CarePlanMapper.mapCarePlanStatusToServiceRequestStatus(status));
+                client.update()
+                        .resource(serviceRequest)
+                        .execute();
+            });
         }
 
         client.update()

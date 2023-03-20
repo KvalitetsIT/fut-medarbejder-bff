@@ -820,9 +820,6 @@ components:
           description: end date for episode of care
           type: string
           format: date-time
-        careTeamId:
-          description: id for CareTeam facilitation this episode of care
-          type: string
         status:
           description: status of episode of care
           $ref: '#/components/schemas/careplanStatus'

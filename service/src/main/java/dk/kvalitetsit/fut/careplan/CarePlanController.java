@@ -52,9 +52,8 @@ public class CarePlanController implements CarePlanApi {
         OffsetDateTime start = careplanUpdateDto.getStart();
         OffsetDateTime end = careplanUpdateDto.getEnd();
         CareplanStatusDto status = careplanUpdateDto.getStatus();
-        String careTeamId = careplanUpdateDto.getCareTeamId();
 
-        carePlanService.updateCarePlan(episodeOfCareId, careplanId, start, end, status, careTeamId);
+        carePlanService.updateCarePlan(episodeOfCareId, careplanId, start, end, status);
         return ResponseEntity.ok().build();
     }
 }

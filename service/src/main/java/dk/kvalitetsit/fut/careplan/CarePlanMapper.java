@@ -1,6 +1,7 @@
 package dk.kvalitetsit.fut.careplan;
 
 import org.hl7.fhir.r4.model.CarePlan;
+import org.hl7.fhir.r4.model.ServiceRequest;
 import org.openapitools.model.CareplanDto;
 import org.openapitools.model.CareplanStatusDto;
 
@@ -53,6 +54,19 @@ public class CarePlanMapper {
             case REVOKED -> CarePlan.CarePlanStatus.REVOKED;
             case UNKNOWN -> CarePlan.CarePlanStatus.UNKNOWN;
             default -> CarePlan.CarePlanStatus.NULL;
+        };
+    }
+
+    public static ServiceRequest.ServiceRequestStatus mapCarePlanStatusToServiceRequestStatus(CareplanStatusDto status) {
+        return switch (status) {
+            case ACTIVE -> ServiceRequest.ServiceRequestStatus.ACTIVE;
+            case COMPLETED -> ServiceRequest.ServiceRequestStatus.COMPLETED;
+            case DRAFT -> ServiceRequest.ServiceRequestStatus.DRAFT;
+            case ENTERED_IN_ERROR -> ServiceRequest.ServiceRequestStatus.ENTEREDINERROR;
+            case ON_HOLD -> ServiceRequest.ServiceRequestStatus.ONHOLD;
+            case REVOKED -> ServiceRequest.ServiceRequestStatus.REVOKED;
+            case UNKNOWN -> ServiceRequest.ServiceRequestStatus.UNKNOWN;
+            default -> ServiceRequest.ServiceRequestStatus.NULL;
         };
     }
 }

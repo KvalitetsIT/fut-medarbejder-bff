@@ -14,5 +14,5 @@ public interface CarePlanService {
 
     String createCarePlan(String episodeofcareId, String plandefinitionId);
 
-    void updateCarePlan(String episodeOfCareId, String careplanId, OffsetDateTime start, OffsetDateTime end, CareplanStatusDto status, String careTeamId);
+    void updateCarePlan(String episodeOfCareId, String careplanId, OffsetDateTime start, OffsetDateTime end, CareplanStatusDto status);
 }
