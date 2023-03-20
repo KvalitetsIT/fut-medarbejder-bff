@@ -2,6 +2,7 @@ package dk.kvalitetsit.fut.careplan;
 
 import org.hl7.fhir.r4.model.CarePlan;
 import org.openapitools.model.CareplanDto;
+import org.openapitools.model.CareplanStatusDto;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -29,16 +30,29 @@ public class CarePlanMapper {
         return careplanDto;
     }
 
-    private static CareplanDto.StatusEnum mapCarePlanStatus(CarePlan.CarePlanStatus status) {
+    private static CareplanStatusDto mapCarePlanStatus(CarePlan.CarePlanStatus status) {
         return switch (status) {
-            case ACTIVE -> CareplanDto.StatusEnum.ACTIVE;
-            case COMPLETED -> CareplanDto.StatusEnum.COMPLETED;
-            case DRAFT -> CareplanDto.StatusEnum.DRAFT;
-            case ENTEREDINERROR -> CareplanDto.StatusEnum.ENTERED_IN_ERROR;
-            case ONHOLD -> CareplanDto.StatusEnum.ON_HOLD;
-            case REVOKED -> CareplanDto.StatusEnum.REVOKED;
-            case UNKNOWN -> CareplanDto.StatusEnum.UNKNOWN;
+            case ACTIVE -> CareplanStatusDto.ACTIVE;
+            case COMPLETED -> CareplanStatusDto.COMPLETED;
+            case DRAFT -> CareplanStatusDto.DRAFT;
+            case ENTEREDINERROR -> CareplanStatusDto.ENTERED_IN_ERROR;
+            case ONHOLD -> CareplanStatusDto.ON_HOLD;
+            case REVOKED -> CareplanStatusDto.REVOKED;
+            case UNKNOWN -> CareplanStatusDto.UNKNOWN;
             case NULL -> null;
+        };
+    }
+
+    public static CarePlan.CarePlanStatus mapCarePlanStatus(CareplanStatusDto status) {
+        return switch (status) {
+            case ACTIVE -> CarePlan.CarePlanStatus.ACTIVE;
+            case COMPLETED -> CarePlan.CarePlanStatus.COMPLETED;
+            case DRAFT -> CarePlan.CarePlanStatus.DRAFT;
+            case ENTERED_IN_ERROR -> CarePlan.CarePlanStatus.ENTEREDINERROR;
+            case ON_HOLD -> CarePlan.CarePlanStatus.ONHOLD;
+            case REVOKED -> CarePlan.CarePlanStatus.REVOKED;
+            case UNKNOWN -> CarePlan.CarePlanStatus.UNKNOWN;
+            default -> CarePlan.CarePlanStatus.NULL;
         };
     }
 }

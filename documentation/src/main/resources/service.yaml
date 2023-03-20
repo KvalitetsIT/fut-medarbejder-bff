@@ -515,6 +515,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/careplan'
+    patch:
+      tags:
+        - CarePlan
+      description: Update the careplan.
+      summary: update careplan
+      operationId: v1PatchCarePlan
+      requestBody:
+        description: New values.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/careplanUpdate'
+      responses:
+        '200':
+          description: Ok
+        '401':
+          $ref: '#/components/responses/401'
 
 components:
   responses:
@@ -775,8 +793,7 @@ components:
           type: string
         status:
           description: status of careplan
-          type: string
-          enum: [ draft, active, on-hold, revoked, completed, entered-in-error, unknown ]
+          $ref: '#/components/schemas/careplanStatus'
         patientId:
           description: id identifying the patient for this careplan
           type: string
@@ -792,6 +809,28 @@ components:
           type: string
           format: date-time
 
+    careplanUpdate:
+      type: object
+      properties:
+        start:
+          description: start date for episode of care
+          type: string
+          format: date-time
+        end:
+          description: end date for episode of care
+          type: string
+          format: date-time
+        careTeamId:
+          description: id for CareTeam facilitation this episode of care
+          type: string
+        status:
+          description: status of episode of care
+          $ref: '#/components/schemas/careplanStatus'
+
+    careplanStatus:
+      type: string
+      enum: [ draft, active, on-hold, revoked, completed, entered-in-error, unknown ]
+      example: "active"
 
 
     helloRequest:

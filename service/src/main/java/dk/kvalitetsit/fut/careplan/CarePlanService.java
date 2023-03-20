@@ -1,7 +1,9 @@
 package dk.kvalitetsit.fut.careplan;
 
 import org.openapitools.model.CareplanDto;
+import org.openapitools.model.CareplanStatusDto;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public interface CarePlanService {
@@ -11,4 +13,6 @@ public interface CarePlanService {
     List<CareplanDto> getCarePlansForCareTeam(String careTeamId);
 
     String createCarePlan(String episodeofcareId, String plandefinitionId);
+
+    void updateCarePlan(String episodeOfCareId, String careplanId, OffsetDateTime start, OffsetDateTime end, CareplanStatusDto status, String careTeamId);
 }

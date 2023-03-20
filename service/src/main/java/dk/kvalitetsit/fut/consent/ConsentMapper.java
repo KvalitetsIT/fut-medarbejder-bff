@@ -1,58 +1,13 @@
 package dk.kvalitetsit.fut.consent;
 
-import org.hl7.fhir.r4.model.CarePlan;
 import org.hl7.fhir.r4.model.Consent;
-import org.hl7.fhir.r4.model.EpisodeOfCare;
-import org.hl7.fhir.r4.model.Reference;
-import org.openapitools.model.CareplanDto;
 import org.openapitools.model.ConsentDto;
-import org.openapitools.model.EpisodeOfCareStatusDto;
-import org.openapitools.model.EpisodeofcareDto;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
 public class ConsentMapper {
-
-    public static EpisodeofcareDto mapEpisodeOfCare(EpisodeOfCare episodeOfCare) {
-        EpisodeofcareDto episodeofcareDto = new EpisodeofcareDto();
-
-        episodeofcareDto.setUuid(episodeOfCare.getIdElement().toUnqualifiedVersionless().getIdPart());
-        episodeofcareDto.setStatus( mapEpisodeOfCareStatus(episodeOfCare.getStatus()) );
-        episodeofcareDto.setStart( toOffsetDateTime(episodeOfCare.getPeriod().getStart()) );
-        episodeofcareDto.setEnd( toOffsetDateTime(episodeOfCare.getPeriod().getEnd()) );
-        episodeofcareDto.setPatientId(episodeOfCare.getPatient().getReferenceElement().toUnqualifiedVersionless().getIdPart());
-
-        return episodeofcareDto;
-    }
-
-    private static EpisodeOfCareStatusDto mapEpisodeOfCareStatus(EpisodeOfCare.EpisodeOfCareStatus status) {
-        return switch (status) {
-            case ACTIVE -> EpisodeOfCareStatusDto.ACTIVE;
-            case PLANNED -> EpisodeOfCareStatusDto.PLANNED;
-            case ONHOLD -> EpisodeOfCareStatusDto.ONHOLD;
-            case FINISHED -> EpisodeOfCareStatusDto.FINISHED;
-            case WAITLIST -> EpisodeOfCareStatusDto.WAITLIST;
-            case CANCELLED -> EpisodeOfCareStatusDto.CANCELLED;
-            case ENTEREDINERROR -> EpisodeOfCareStatusDto.ENTERED_IN_ERROR;
-            case NULL -> null;
-        };
-    }
-
-    public static EpisodeOfCare.EpisodeOfCareStatus mapEpisodeOfCareStatus(EpisodeOfCareStatusDto status) {
-        return switch (status) {
-            case ACTIVE -> EpisodeOfCare.EpisodeOfCareStatus.ACTIVE;
-            case PLANNED -> EpisodeOfCare.EpisodeOfCareStatus.PLANNED;
-            case ONHOLD -> EpisodeOfCare.EpisodeOfCareStatus.ONHOLD;
-            case FINISHED -> EpisodeOfCare.EpisodeOfCareStatus.FINISHED;
-            case WAITLIST -> EpisodeOfCare.EpisodeOfCareStatus.WAITLIST;
-            case CANCELLED -> EpisodeOfCare.EpisodeOfCareStatus.CANCELLED;
-            case ENTERED_IN_ERROR -> EpisodeOfCare.EpisodeOfCareStatus.ENTEREDINERROR;
-            default -> EpisodeOfCare.EpisodeOfCareStatus.NULL;
-        };
-
-    }
 
     private static ConsentDto.StatusEnum mapConsentStatus(Consent.ConsentState status) {
         return switch (status) {
@@ -84,35 +39,5 @@ public class ConsentMapper {
         consentDto.setEpisodeOfCareId(consent.getProvision().getDataFirstRep().getReference().getReferenceElement().toUnqualifiedVersionless().getIdPart());
 
         return consentDto;
-    }
-
-    public static CareplanDto mapCarePlan(CarePlan carePlan) {
-        CareplanDto careplanDto = new CareplanDto();
-
-        careplanDto.setId(carePlan.getIdElement().toUnqualifiedVersionless().getIdPart());
-        careplanDto.setStatus( mapCarePlanStatus(carePlan.getStatus()) );
-        careplanDto.setPatientId(carePlan.getSubject().getReferenceElement().toUnqualifiedVersionless().getIdPart());
-        careplanDto.setCareTeamId(carePlan.getCareTeamFirstRep().getReferenceElement().toUnqualifiedVersionless().getIdPart());
-        careplanDto.setStart( toOffsetDateTime(carePlan.getPeriod().getStart()) );
-        careplanDto.setEnd( toOffsetDateTime(carePlan.getPeriod().getEnd()) );
-
-        return careplanDto;
-    }
-
-    private String getIdFromReference(Reference reference) {
-        return null;
-    }
-
-    private static CareplanDto.StatusEnum mapCarePlanStatus(CarePlan.CarePlanStatus status) {
-        return switch (status) {
-            case ACTIVE -> CareplanDto.StatusEnum.ACTIVE;
-            case COMPLETED -> CareplanDto.StatusEnum.COMPLETED;
-            case DRAFT -> CareplanDto.StatusEnum.DRAFT;
-            case ENTEREDINERROR -> CareplanDto.StatusEnum.ENTERED_IN_ERROR;
-            case ONHOLD -> CareplanDto.StatusEnum.ON_HOLD;
-            case REVOKED -> CareplanDto.StatusEnum.REVOKED;
-            case UNKNOWN -> CareplanDto.StatusEnum.UNKNOWN;
-            case NULL -> null;
-        };
     }
 }

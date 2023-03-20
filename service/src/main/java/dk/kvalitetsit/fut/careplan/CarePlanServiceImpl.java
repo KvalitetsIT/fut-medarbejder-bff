@@ -9,23 +9,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.kvalitetsit.fut.auth.AuthService;
 import org.hl7.fhir.r4.model.*;
 import org.openapitools.model.CareplanDto;
+import org.openapitools.model.CareplanStatusDto;
 import org.openapitools.model.ContextDto;
-import org.openapitools.model.PatientDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
+import java.sql.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CarePlanServiceImpl implements CarePlanService {
     private static final Logger logger = LoggerFactory.getLogger(CarePlanServiceImpl.class);
 
-    private final Map<String, PatientDto> patients = new HashMap<>();
-    private FhirContext fhirContext;
-    private String careplanServiceUrl;
-    private AuthService authService;
+    private final FhirContext fhirContext;
+    private final String careplanServiceUrl;
+    private final AuthService authService;
 
     public CarePlanServiceImpl(FhirContext fhirContext, String careplanServiceUrl, AuthService authService) {
         this.fhirContext = fhirContext;
@@ -54,7 +53,7 @@ public class CarePlanServiceImpl implements CarePlanService {
         List<CarePlan> result = lookupByCriteria(CarePlan.class, List.of(careTeamCriteria));
 
         return result.stream()
-                .map(carePlan -> CarePlanMapper.mapCarePlan(carePlan))
+                .map(CarePlanMapper::mapCarePlan)
                 .collect(Collectors.toList());
     }
 
@@ -84,7 +83,33 @@ public class CarePlanServiceImpl implements CarePlanService {
         return result.getIdElement().toUnqualifiedVersionless().getIdPart();
     }
 
+    @Override
+    public void updateCarePlan(String episodeOfCareId, String careplanId, OffsetDateTime start, OffsetDateTime end, CareplanStatusDto status, String careTeamId) {
+        String episodeOfCareUrl = "https://careplan.devenvcgi.ehealth.sundhed.dk/fhir/EpisodeOfCare/"+episodeOfCareId;
 
+        IGenericClient client = getFhirClientWithEpisodeOfCareContext(episodeOfCareUrl);
+        CarePlan carePlan = client.read()
+                .resource(CarePlan.class)
+                .withId("CarePlan/" + careplanId)
+                .execute();
+
+        if (start != null) {
+            carePlan.getPeriod().setStart(Date.from(start.toInstant()));
+        }
+        if (end != null) {
+            carePlan.getPeriod().setEnd(Date.from(end.toInstant()));
+        }
+        if (status != null) {
+            CarePlan.CarePlanStatus newStatus = CarePlanMapper.mapCarePlanStatus(status);
+            carePlan.setStatus(newStatus);
+        }
+
+        client.update()
+                .resource(carePlan)
+                .execute();
+
+        logger.info(String.format("Updated CarePlan with id: %s", careplanId));
+    }
 
     private <T extends Resource> List<T> lookupByCriteria(Class<T> resourceClass, List<ICriterion> criteria) {
         IGenericClient client = getFhirClient();
