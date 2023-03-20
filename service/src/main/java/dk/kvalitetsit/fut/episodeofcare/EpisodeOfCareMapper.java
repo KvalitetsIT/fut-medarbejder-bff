@@ -15,7 +15,7 @@ import java.util.Date;
 
 public class EpisodeOfCareMapper {
 
-    public static EpisodeofcareDto mapEpisodeOfCare(EpisodeOfCare episodeOfCare) {
+    public static EpisodeofcareDto mapEpisodeOfCare(EpisodeOfCare episodeOfCare, String conditionCode) {
         EpisodeofcareDto episodeofcareDto = new EpisodeofcareDto();
 
         episodeofcareDto.setUuid(episodeOfCare.getIdElement().toUnqualifiedVersionless().getIdPart());
@@ -23,6 +23,7 @@ public class EpisodeOfCareMapper {
         episodeofcareDto.setStart( toOffsetDateTime(episodeOfCare.getPeriod().getStart()) );
         episodeofcareDto.setEnd( toOffsetDateTime(episodeOfCare.getPeriod().getEnd()) );
         episodeofcareDto.setPatientId(episodeOfCare.getPatient().getReferenceElement().toUnqualifiedVersionless().getIdPart());
+        episodeofcareDto.setConditionCode(conditionCode);
 
         return episodeofcareDto;
     }

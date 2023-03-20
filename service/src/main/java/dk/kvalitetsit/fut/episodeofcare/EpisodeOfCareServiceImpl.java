@@ -7,17 +7,20 @@ import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.IQuery;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import dk.kvalitetsit.fut.auth.AuthService;
-import org.apache.logging.log4j.util.Strings;
 import org.hl7.fhir.r4.model.*;
-import org.openapitools.model.*;
+
+import org.apache.logging.log4j.util.Strings;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.openapitools.model.*;
+import dk.kvalitetsit.fut.auth.AuthService;
 
 public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
     private static final Logger logger = LoggerFactory.getLogger(EpisodeOfCareServiceImpl.class);
@@ -32,8 +35,6 @@ public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
         this.authService = authService;
     }
 
-
-
     @Override
     public List<EpisodeofcareDto> getEpisodeOfCaresForCareTeam(String careTeamId) {
         var teamCriteria = new ReferenceClientParam("team").hasId("https://organization.devenvcgi.ehealth.sundhed.dk/fhir/CareTeam/" + careTeamId);
@@ -41,7 +42,7 @@ public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
         List<EpisodeOfCare> result = lookupByCriteria(EpisodeOfCare.class, List.of(teamCriteria));
 
         return result.stream()
-                .map(episodeOfCare -> EpisodeOfCareMapper.mapEpisodeOfCare(episodeOfCare))
+                .map(episodeOfCare -> EpisodeOfCareMapper.mapEpisodeOfCare(episodeOfCare, ""))
                 .collect(Collectors.toList());
     }
 
@@ -158,7 +159,17 @@ public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
                 .withId(episodeOfCareId)
                 .execute();
 
-        return EpisodeOfCareMapper.mapEpisodeOfCare(result);
+        Reference r = result.getDiagnosis().get(0).getCondition();
+
+        Condition condition = client
+                .read()
+                .resource(Condition.class)
+                .withUrl(result.getDiagnosis().get(0).getCondition().getReference())
+                .execute();
+        String code = condition.getCode().getCoding().get(0).getCode();
+        //String display = condition.getCode().getCoding().get(0).getDisplay();
+
+        return EpisodeOfCareMapper.mapEpisodeOfCare(result, code);
     }
 
     @Override

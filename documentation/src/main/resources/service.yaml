@@ -641,6 +641,9 @@ components:
         patientId:
           description: uuid identifying the patient for this episode of care
           type: string
+        conditionCode:
+          description: the code of the condition (diagnosis)
+          type: string
 
     createEpisodeOfCare:
       type: object
