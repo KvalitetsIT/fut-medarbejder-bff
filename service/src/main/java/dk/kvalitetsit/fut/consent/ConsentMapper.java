@@ -32,6 +32,7 @@ public class ConsentMapper {
         ConsentDto consentDto = new ConsentDto();
 
         consentDto.setId(consent.getIdElement().toUnqualifiedVersionless().getIdPart());
+        consentDto.setType( ConsentDto.TypeEnum.fromValue(consent.getCategoryFirstRep().getCodingFirstRep().getCode()) );
         consentDto.setStatus( mapConsentStatus(consent.getStatus()) );
         consentDto.setStart( toOffsetDateTime(consent.getProvision().getPeriod().getStart()) );
         consentDto.setEnd( toOffsetDateTime(consent.getProvision().getPeriod().getEnd()) );

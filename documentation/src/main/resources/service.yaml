@@ -732,8 +732,12 @@ components:
         id:
           description: an id identifying the consent
           type: string
+        type:
+          description: Classification of the consent statement
+          type: string
+          enum: [ TBD, PITEOC, SSLPCI ]
         status:
-          description: status of conseńt
+          description: status of consent
           type: string
           enum: [ draft, proposed, active, rejected, inactive, entered-in-error ]
         start:
