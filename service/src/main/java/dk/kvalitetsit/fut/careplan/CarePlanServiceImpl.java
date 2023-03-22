@@ -5,6 +5,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.IQuery;
+import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.kvalitetsit.fut.auth.AuthService;
 import org.hl7.fhir.r4.model.*;
@@ -51,6 +52,21 @@ public class CarePlanServiceImpl implements CarePlanService {
         var careTeamCriteria = CarePlan.CARE_TEAM.hasId(careTeamUrl);
 
         List<CarePlan> result = lookupByCriteria(CarePlan.class, List.of(careTeamCriteria));
+
+        return result.stream()
+                .map(CarePlanMapper::mapCarePlan)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CareplanDto> getCarePlansForCareTeam(String careTeamId, String episodeOfCareId) {
+        String careTeamUrl = "https://organization.devenvcgi.ehealth.sundhed.dk/fhir/CareTeam/"+careTeamId;
+        var careTeamCriteria = CarePlan.CARE_TEAM.hasId(careTeamUrl);
+
+        String episodeOfCareUrl = "https://careplan.devenvcgi.ehealth.sundhed.dk/fhir/EpisodeOfCare/"+episodeOfCareId;
+        var episodeOfCareCriteria = new ReferenceClientParam("episodeOfCare").hasId(episodeOfCareUrl);
+
+        List<CarePlan> result = lookupByCriteria(CarePlan.class, List.of(careTeamCriteria, episodeOfCareCriteria));
 
         return result.stream()
                 .map(CarePlanMapper::mapCarePlan)

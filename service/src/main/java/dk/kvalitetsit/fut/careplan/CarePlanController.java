@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class CarePlanController implements CarePlanApi {
@@ -36,6 +37,12 @@ public class CarePlanController implements CarePlanApi {
         List<CareplanDto> careplans = carePlanService.getCarePlansForCareTeam(careTeamId);
         return ResponseEntity.ok(careplans);
 
+    }
+
+    @Override
+    public ResponseEntity<List<CareplanDto>> v1GetCarePlansOnEpisodeOfCareForCareTeam(String careTeamId, String episodeOfCareId) {
+        List<CareplanDto> careplans = carePlanService.getCarePlansForCareTeam(careTeamId, episodeOfCareId);
+        return ResponseEntity.ok(careplans);
     }
 
     @Override

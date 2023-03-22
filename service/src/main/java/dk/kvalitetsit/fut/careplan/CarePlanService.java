@@ -12,6 +12,8 @@ public interface CarePlanService {
 
     List<CareplanDto> getCarePlansForCareTeam(String careTeamId);
 
+    List<CareplanDto> getCarePlansForCareTeam(String careTeamId, String episodeOfCareId);
+
     String createCarePlan(String episodeofcareId, String plandefinitionId);
 
     void updateCarePlan(String episodeOfCareId, String careplanId, OffsetDateTime start, OffsetDateTime end, CareplanStatusDto status);
