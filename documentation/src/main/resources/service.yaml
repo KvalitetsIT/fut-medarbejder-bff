@@ -281,6 +281,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/CareTeam'
 
+  /v1/careteams/{careTeamId}/tasks:
+    parameters:
+      - in: path
+        name: careTeamId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the CareTeam
+    get:
+      tags:
+        - Task
+      description: Request a list of Tasks concerning the CareTeam
+      summary: get Tasks for CareTeam
+      operationId: v1GetTasksForCareTeam
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasks'
+
   /v1/episodeofcares:
     get:
       tags:
@@ -863,6 +885,40 @@ components:
       type: string
       enum: [ draft, active, on-hold, revoked, completed, entered-in-error, unknown ]
       example: "active"
+
+    tasks:
+      type: array
+      items:
+        $ref: '#/components/schemas/task'
+
+    task:
+      type: object
+      properties:
+        id:
+          description: an id identifying the careplan
+          type: string
+        status:
+          description: status of careplan
+          type: string
+          enum: [ draft, requested, received, accepted, rejected, ready, cancelled, in-progress, on-hold, failed, completed, entered-in-error ]
+        clinicalImpressionId:
+          description: id identifying the clinical impression
+          type: string
+        description:
+          description: start date for this
+          type: string
+          format: string
+        priority:
+          description:
+          type: string
+          format: string
+        authoredDate:
+          description: authored date
+          type: string
+          format: date-time
+        category:
+          description: category of task
+          type: string
 
 
     helloRequest:
