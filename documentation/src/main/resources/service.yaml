@@ -584,6 +584,34 @@ paths:
         '401':
           $ref: '#/components/responses/401'
 
+  /v1/episodeofcares/{episodeOfCareId}/clinicalimpressions/{clinicalImpressionId}:
+    parameters:
+      - in: path
+        name: episodeOfCareId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the episode of care to access specific clinical impression for
+      - in: path
+        name: clinicalImpressionId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the clinical impression to access
+    get:
+      tags:
+        - ClinicalImpression
+      description: Request a specific clinical impression for an episode of care.
+      summary: get clinical impression
+      operationId: v1GetClinicalImpressionForEpisodeOfCare
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/clinicalimpression'
+
 components:
   responses:
     '400':
@@ -904,6 +932,9 @@ components:
         clinicalImpressionId:
           description: id identifying the clinical impression
           type: string
+        episodeOfCareId:
+          description: id identifying the episode of care
+          type: string
         description:
           description: start date for this
           type: string
@@ -919,6 +950,36 @@ components:
         category:
           description: category of task
           type: string
+
+    clinicalimpression:
+      type: object
+      properties:
+        id:
+          description: an id identifying the clinical impression
+          type: string
+        type:
+          description: type of clinical impression
+          type: string
+        careplanId:
+          description: id of careplan the clinical impression references
+          type: string
+        questionnaireResponseId:
+          description: id of questionnaire response
+          type: string
+        date:
+          description: date
+          type: string
+          format: date-time
+        finding:
+          description: what was found
+          type: string
+#        findings:
+#          description: the basis for what was found
+#          type: array
+#          items:
+#            type: object
+#            properties:
+#
 
 
     helloRequest:

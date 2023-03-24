@@ -2,6 +2,7 @@ package dk.kvalitetsit.fut.task;
 
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.openapitools.model.TaskDto;
 
@@ -29,6 +30,15 @@ public class TaskMapper {
                 taskDto.setCategory(category);
             }
         }
+
+        if (task.hasExtension("http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-task-episodeOfCare")) {
+            Extension ext = task.getExtensionByUrl("http://ehealth.sundhed.dk/fhir/StructureDefinition/ehealth-task-episodeOfCare");
+            if (ext.getValue() instanceof Reference) {
+                String episodeOfCareId = ((Reference) ext.getValue()).getReferenceElement().toUnqualifiedVersionless().getIdPart();
+                taskDto.setEpisodeOfCareId(episodeOfCareId);
+            }
+        }
+
         return taskDto;
     }
 

@@ -39,7 +39,9 @@ public class AuthService {
         map.add("grant_type", "refresh_token");
         map.add("refresh_token", refreshToken);
         map.add("client_id", "oio_mock");
-        map.add("care_team_id", careTeamId);
+        if (careTeamId != null) {
+            map.add("care_team_id", careTeamId);
+        }
         if (episodeOfCareId != null) {
             map.add("episode_of_care_id", episodeOfCareId);
         }
@@ -115,6 +117,10 @@ public class AuthService {
 
     public Token refreshTokenWithCareTeamAndPatientContext(Token token, String careTeamId, String patientId) throws JsonProcessingException {
         return refreshToken(token.refreshToken(), careTeamId, null, patientId);
+    }
+
+    public Token refreshTokenWithEpisodeOfCareContext(Token token, String episodeOfCareId) throws JsonProcessingException {
+        return refreshToken(token.refreshToken(), null, episodeOfCareId, null);
     }
 
     public UserInfoDto getUserInfo(Token token) throws JsonProcessingException {
