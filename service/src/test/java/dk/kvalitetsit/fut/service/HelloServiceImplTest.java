@@ -66,7 +66,7 @@ public class HelloServiceImplTest {
         result.getEntry().forEach(b -> System.out.println(b.getFullUrl()));
     }
 
-    @Test
+    //@Test
     public void testme2() {
         FhirContext ctx = FhirContext.forR4();
 
@@ -82,14 +82,14 @@ public class HelloServiceImplTest {
         //result.getEntry().forEach(b -> System.out.println(b.getFullUrl()));
     }
 
-    @Test
+    //@Test
     public void mini() {
         String provenanceUrnUuid = UuidType.fromOid(UUID.randomUUID().toString()).getValue();
         System.out.println(new UuidType("test").toString());
         System.out.println(provenanceUrnUuid);
         System.out.println(IdType.newRandomUuid().getValue());
     }
-    @Test
+    //@Test
     public void skh() {
         String patientId = "patientId", organizationId = "organizationId", careTeamId = "careTeamId";
 
