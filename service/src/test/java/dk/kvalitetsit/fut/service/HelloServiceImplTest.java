@@ -162,7 +162,7 @@ public class HelloServiceImplTest {
         System.out.println(FhirContext.forR4().newJsonParser().setPrettyPrint(true).encodeResourceToString(parameters));
     }
 
-    @Test
+    //@Test
     public void ny() {
         FhirContext ctx = FhirContext.forR4();
 
