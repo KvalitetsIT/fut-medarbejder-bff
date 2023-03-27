@@ -231,6 +231,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/episodeofcares'
 
+  /v1/careteams/{careTeamId}/episodeofcares/{episodeOfCareId}/careplans:
+    get:
+      tags:
+        - CarePlan
+      description: Returns a list of CarePlan on a specific EpisodeOfCare for the CareTeam.
+      summary: Find CarePlans for EpisodeOfCare by CareTeam id.
+      operationId: v1GetCarePlansOnEpisodeOfCareForCareTeam
+      parameters:
+        - in: path
+          name: careTeamId
+          description: an id identifying the careteam responsible for the episode of cares
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: episodeOfCareId
+          description: an id identifying the episode of cares
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/careplans'
+
 
   /v1/careteams/{id}:
     parameters:
@@ -252,6 +280,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CareTeam'
+
+  /v1/careteams/{careTeamId}/tasks:
+    parameters:
+      - in: path
+        name: careTeamId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the CareTeam
+    get:
+      tags:
+        - Task
+      description: Request a list of Tasks concerning the CareTeam
+      summary: get Tasks for CareTeam
+      operationId: v1GetTasksForCareTeam
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasks'
 
   /v1/episodeofcares:
     get:
@@ -515,6 +565,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/careplan'
+    patch:
+      tags:
+        - CarePlan
+      description: Update the careplan.
+      summary: update careplan
+      operationId: v1PatchCarePlan
+      requestBody:
+        description: New values.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/careplanUpdate'
+      responses:
+        '200':
+          description: Ok
+        '401':
+          $ref: '#/components/responses/401'
+
+  /v1/episodeofcares/{episodeOfCareId}/clinicalimpressions/{clinicalImpressionId}:
+    parameters:
+      - in: path
+        name: episodeOfCareId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the episode of care to access specific clinical impression for
+      - in: path
+        name: clinicalImpressionId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the clinical impression to access
+    get:
+      tags:
+        - ClinicalImpression
+      description: Request a specific clinical impression for an episode of care.
+      summary: get clinical impression
+      operationId: v1GetClinicalImpressionForEpisodeOfCare
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/clinicalimpression'
 
 components:
   responses:
@@ -714,8 +810,12 @@ components:
         id:
           description: an id identifying the consent
           type: string
+        type:
+          description: Classification of the consent statement
+          type: string
+          enum: [ TBD, PITEOC, SSLPCI ]
         status:
-          description: status of conseńt
+          description: status of consent
           type: string
           enum: [ draft, proposed, active, rejected, inactive, entered-in-error ]
         start:
@@ -775,10 +875,12 @@ components:
           type: string
         status:
           description: status of careplan
-          type: string
-          enum: [ draft, active, on-hold, revoked, completed, entered-in-error, unknown ]
+          $ref: '#/components/schemas/careplanStatus'
         patientId:
           description: id identifying the patient for this careplan
+          type: string
+        episodeOfCareId:
+          description: id identifying the episode of care
           type: string
         careTeamId:
           description: id identifying the careteam for this careplan
@@ -792,6 +894,92 @@ components:
           type: string
           format: date-time
 
+    careplanUpdate:
+      type: object
+      properties:
+        start:
+          description: start date for episode of care
+          type: string
+          format: date-time
+        end:
+          description: end date for episode of care
+          type: string
+          format: date-time
+        status:
+          description: status of episode of care
+          $ref: '#/components/schemas/careplanStatus'
+
+    careplanStatus:
+      type: string
+      enum: [ draft, active, on-hold, revoked, completed, entered-in-error, unknown ]
+      example: "active"
+
+    tasks:
+      type: array
+      items:
+        $ref: '#/components/schemas/task'
+
+    task:
+      type: object
+      properties:
+        id:
+          description: an id identifying the careplan
+          type: string
+        status:
+          description: status of careplan
+          type: string
+          enum: [ draft, requested, received, accepted, rejected, ready, cancelled, in-progress, on-hold, failed, completed, entered-in-error ]
+        clinicalImpressionId:
+          description: id identifying the clinical impression
+          type: string
+        episodeOfCareId:
+          description: id identifying the episode of care
+          type: string
+        description:
+          description: start date for this
+          type: string
+          format: string
+        priority:
+          description:
+          type: string
+          format: string
+        authoredDate:
+          description: authored date
+          type: string
+          format: date-time
+        category:
+          description: category of task
+          type: string
+
+    clinicalimpression:
+      type: object
+      properties:
+        id:
+          description: an id identifying the clinical impression
+          type: string
+        type:
+          description: type of clinical impression
+          type: string
+        careplanId:
+          description: id of careplan the clinical impression references
+          type: string
+        questionnaireResponseId:
+          description: id of questionnaire response
+          type: string
+        date:
+          description: date
+          type: string
+          format: date-time
+        finding:
+          description: what was found
+          type: string
+#        findings:
+#          description: the basis for what was found
+#          type: array
+#          items:
+#            type: object
+#            properties:
+#
 
 
     helloRequest:
