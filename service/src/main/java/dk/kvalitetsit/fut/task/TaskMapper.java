@@ -5,6 +5,7 @@ import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Task;
 import org.openapitools.model.TaskDto;
+import org.openapitools.model.TaskStatusDto;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -42,20 +43,20 @@ public class TaskMapper {
         return taskDto;
     }
 
-    private static TaskDto.StatusEnum mapTaskStatus(Task.TaskStatus status) {
+    private static TaskStatusDto mapTaskStatus(Task.TaskStatus status) {
         return switch (status) {
-            case DRAFT ->  TaskDto.StatusEnum.DRAFT;
-            case REQUESTED -> TaskDto.StatusEnum.REQUESTED;
-            case RECEIVED -> TaskDto.StatusEnum.RECEIVED;
-            case ACCEPTED -> TaskDto.StatusEnum.ACCEPTED;
-            case REJECTED ->  TaskDto.StatusEnum.REJECTED;
-            case READY -> TaskDto.StatusEnum.READY;
-            case CANCELLED -> TaskDto.StatusEnum.CANCELLED;
-            case INPROGRESS -> TaskDto.StatusEnum.IN_PROGRESS;
-            case ONHOLD -> TaskDto.StatusEnum.ON_HOLD;
-            case FAILED -> TaskDto.StatusEnum.FAILED;
-            case COMPLETED -> TaskDto.StatusEnum.COMPLETED;
-            case ENTEREDINERROR -> TaskDto.StatusEnum.ENTERED_IN_ERROR;
+            case DRAFT ->  TaskStatusDto.DRAFT;
+            case REQUESTED -> TaskStatusDto.REQUESTED;
+            case RECEIVED -> TaskStatusDto.RECEIVED;
+            case ACCEPTED -> TaskStatusDto.ACCEPTED;
+            case REJECTED ->  TaskStatusDto.REJECTED;
+            case READY -> TaskStatusDto.READY;
+            case CANCELLED -> TaskStatusDto.CANCELLED;
+            case INPROGRESS -> TaskStatusDto.IN_PROGRESS;
+            case ONHOLD -> TaskStatusDto.ON_HOLD;
+            case FAILED -> TaskStatusDto.FAILED;
+            case COMPLETED -> TaskStatusDto.COMPLETED;
+            case ENTEREDINERROR -> TaskStatusDto.ENTERED_IN_ERROR;
             case NULL -> null;
         };
     }

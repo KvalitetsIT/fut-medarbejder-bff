@@ -18,11 +18,9 @@ public class TaskController implements TaskApi {
         this.taskService = taskService;
     }
 
-
-
     @Override
-    public ResponseEntity<List<TaskDto>> v1GetTasksForCareTeam(String careTeamId) {
-        List<TaskDto> tasks = taskService.getTasks(careTeamId);
+    public ResponseEntity<List<TaskDto>> v1GetTasksForCareTeam(String careTeamId, String status) {
+        List<TaskDto> tasks = taskService.getTasks(careTeamId, status);
         return ResponseEntity.ok(tasks);
         //return ResponseEntity.ok(patients);
     }

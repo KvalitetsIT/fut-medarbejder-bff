@@ -31,7 +31,7 @@ public class TaskServiceImpl  {
     }
 
     //@Override
-    public List<TaskDto> getTasks(String careTeamId) {
+    public List<TaskDto> getTasks(String careTeamId, String status) {
         String careTeamUrl = "https://organization.devenvcgi.ehealth.sundhed.dk/fhir/CareTeam/"+careTeamId;
 
         AuthService.Token token = authService.getToken();
@@ -39,11 +39,15 @@ public class TaskServiceImpl  {
 
         IGenericClient client = getFhirClient(token);
         try {
-            Bundle result = client
-                    .search().forResource(Task.class)
+            IQuery<Bundle> query = client.search().forResource(Task.class)
                     .where(new ReferenceClientParam("responsible").hasId(careTeamUrl))
-                    .returnBundle(Bundle.class)
-                    .execute();
+                    .returnBundle(Bundle.class);
+
+            if (status !=  null) {
+                query.and(Task.STATUS.exactly().codes(status));
+            }
+
+            Bundle result = query.execute();
 
             return result.getEntry().stream()
                     .map(bundleEntryComponent -> (Task)bundleEntryComponent.getResource())
