@@ -63,4 +63,10 @@ public class CarePlanController implements CarePlanApi {
         carePlanService.updateCarePlan(episodeOfCareId, careplanId, start, end, status);
         return ResponseEntity.ok().build();
     }
+
+    @Override
+    public ResponseEntity<Void> v1DeleteCarePlanForEpisodeOfCare(String episodeOfCareId, String careplanId) {
+        carePlanService.deleteCarePlan(episodeOfCareId, careplanId);
+        return ResponseEntity.ok().build();
+    }
 }

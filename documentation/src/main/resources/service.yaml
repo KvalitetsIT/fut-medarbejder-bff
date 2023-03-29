@@ -617,6 +617,15 @@ paths:
           description: Ok
         '401':
           $ref: '#/components/responses/401'
+    delete:
+      tags:
+        - CarePlan
+      description: Delete a careplan.
+      summary: delete careplan
+      operationId: v1DeleteCarePlanForEpisodeOfCare
+      responses:
+        '200':
+          description: Ok
 
   /v1/episodeofcares/{episodeOfCareId}/tasks/{taskId}:
     parameters:

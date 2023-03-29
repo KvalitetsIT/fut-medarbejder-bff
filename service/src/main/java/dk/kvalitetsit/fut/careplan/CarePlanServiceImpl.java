@@ -139,6 +139,16 @@ public class CarePlanServiceImpl implements CarePlanService {
         logger.info(String.format("Updated CarePlan with id: %s", careplanId));
     }
 
+    @Override
+    public void deleteCarePlan(String episodeOfCareId, String careplanId) {
+        CareplanDto carePlan = this.getCarePlan(episodeOfCareId, careplanId);
+        switch (carePlan.getStatus()) {
+            case DRAFT -> updateCarePlan(episodeOfCareId, careplanId, null, OffsetDateTime.now(), CareplanStatusDto.ENTERED_IN_ERROR);
+            case ACTIVE -> updateCarePlan(episodeOfCareId, careplanId, null, OffsetDateTime.now(), CareplanStatusDto.REVOKED);
+            default -> logger.warn(String.format("Not Implemented! Trying to delete CarePlan with status: %s.", carePlan.getStatus().toString()));
+        }
+    }
+
     private <T extends Resource> List<T> lookupByCriteria(Class<T> resourceClass, List<ICriterion> criteria) {
         IGenericClient client = getFhirClient();
 
