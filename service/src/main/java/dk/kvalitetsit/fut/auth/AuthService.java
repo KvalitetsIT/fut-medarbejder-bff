@@ -15,20 +15,21 @@ import java.util.Map;
 
 public class AuthService {
     public record Token(String accessToken, String refreshToken){};
-    public final String USERNAME = "Gr6_medarbejder9";
-    public final String PASSWORD = "Test1266";
+    private final String USERNAME;
+    private final String PASSWORD;
     private final String authTokenUrl;
     private final String authUserinfoUrl;
     private final String authContextUrl;
 
-    public AuthService(String authServerUrl, String authUserinfoUrl, String authContextUrl) {
+    public AuthService(String username, String password,
+                       String authServerUrl, String authUserinfoUrl, String authContextUrl) {
+        this.USERNAME = username;
+        this.PASSWORD = password;
         this.authTokenUrl = authServerUrl;
         this.authUserinfoUrl = authUserinfoUrl;
         this.authContextUrl = authContextUrl;
     }
 
-    // TODO: Misvisende navngivning:
-    // careTeamId er faktisk en resource URL...
     private Token refreshToken(String refreshToken, String careTeamId, String episodeOfCareId, String patientId) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
@@ -59,7 +60,7 @@ public class AuthService {
         return new Token(map2.get("access_token"), map2.get("refresh_token"));
     }
 
-    private Token createToken(String username, String password, String careTeamId, String patientId) throws JsonProcessingException {
+    private Token createToken(String careTeamId, String patientId) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -67,8 +68,8 @@ public class AuthService {
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("grant_type", "password");
-        map.add("username", username);
-        map.add("password", password);
+        map.add("username", USERNAME);
+        map.add("password", PASSWORD);
         map.add("client_id", "oio_mock");
 
         if (careTeamId != null) {
@@ -89,22 +90,18 @@ public class AuthService {
 
     public Token getToken() {
         try {
-            return this.createToken(USERNAME, PASSWORD, null, null);
+            return this.createToken(null, null);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Token getToken(String username, String password) throws JsonProcessingException {
-        return createToken(username, password, null, null);
+    public Token getTokenWithCareTeamContext(String careTeamId) throws JsonProcessingException {
+        return createToken(careTeamId, null);
     }
 
-    public Token getTokenWithCareTeamContext(String username, String password, String careTeamId) throws JsonProcessingException {
-        return createToken(username, password, careTeamId, null);
-    }
-
-    public Token getTokenWithPatientContext(String username, String password, String patientId) throws JsonProcessingException {
-        return this.createToken(username, password, null, patientId);
+    public Token getTokenWithPatientContext(String patientId) throws JsonProcessingException {
+        return this.createToken(null, patientId);
     }
 
     public Token refreshTokenWithCareTeamContext(Token token, String careTeamId) throws JsonProcessingException {
