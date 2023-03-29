@@ -61,6 +61,27 @@ public class TaskMapper {
         };
     }
 
+    public static Task.TaskStatus mapTaskStatus(TaskStatusDto status) {
+        if (status == null) {
+            return Task.TaskStatus.NULL;
+        }
+
+        return switch (status) {
+            case DRAFT ->  Task.TaskStatus.DRAFT;
+            case REQUESTED -> Task.TaskStatus.REQUESTED;
+            case RECEIVED -> Task.TaskStatus.RECEIVED;
+            case ACCEPTED -> Task.TaskStatus.ACCEPTED;
+            case REJECTED ->  Task.TaskStatus.REJECTED;
+            case READY -> Task.TaskStatus.READY;
+            case CANCELLED -> Task.TaskStatus.CANCELLED;
+            case IN_PROGRESS -> Task.TaskStatus.INPROGRESS;
+            case ON_HOLD -> Task.TaskStatus.ONHOLD;
+            case FAILED -> Task.TaskStatus.FAILED;
+            case COMPLETED -> Task.TaskStatus.COMPLETED;
+            case ENTERED_IN_ERROR -> Task.TaskStatus.ENTEREDINERROR;
+        };
+    }
+
     private static OffsetDateTime toOffsetDateTime(Date date) {
         if (date == null) {
             return null;
