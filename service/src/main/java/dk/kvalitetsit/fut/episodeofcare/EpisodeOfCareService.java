@@ -14,4 +14,6 @@ public interface EpisodeOfCareService {
     EpisodeofcareDto getEpisodeOfCare(String episodeOfCareId);
 
     void updateEpisodeOfCare(String episodeOfCareId, OffsetDateTime start, OffsetDateTime end, EpisodeOfCareStatusDto status, String careTeamId);
+
+    void deleteEpisodeOfCare(String episodeOfCareId);
 }

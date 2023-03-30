@@ -1,10 +1,8 @@
 package dk.kvalitetsit.fut.episodeofcare;
 
+import dk.kvalitetsit.fut.careplan.CarePlanService;
 import org.openapitools.api.EpisodeOfCareApi;
-import org.openapitools.model.CreateEpisodeOfCareDto;
-import org.openapitools.model.EpisodeOfCareStatusDto;
-import org.openapitools.model.EpisodeofcareDto;
-import org.openapitools.model.UpdateEpisodeOfCareDto;
+import org.openapitools.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +17,14 @@ import java.util.List;
 public class EpisodeOfCareController implements EpisodeOfCareApi {
 
     private final EpisodeOfCareService episodeOfCareService;
+    private final CarePlanService carePlanService;
 
     private static final Logger logger = LoggerFactory.getLogger(EpisodeOfCareController.class);
 
 
-    public EpisodeOfCareController(EpisodeOfCareService episodeOfCareService) {
+    public EpisodeOfCareController(EpisodeOfCareService episodeOfCareService, CarePlanService carePlanService) {
         this.episodeOfCareService = episodeOfCareService;
+        this.carePlanService = carePlanService;
     }
 
     @Override
@@ -67,5 +67,19 @@ public class EpisodeOfCareController implements EpisodeOfCareApi {
         String episodeOfCareId = episodeOfCareService.createEpisodeOfCare(careTeamId, patientId, provenance, conditionCodes);
         URI location = URI.create(ServletUriComponentsBuilder.fromCurrentRequestUri().path("/" + episodeOfCareId).build().toString());
         return ResponseEntity.created(location).build();
+    }
+
+    @Override
+    public ResponseEntity<Void> v1DeleteEpisodeOfCare(String episodeOfCareId) {
+        EpisodeofcareDto episodeOfCare = episodeOfCareService.getEpisodeOfCare(episodeOfCareId);
+
+        // first delete careplans, this will also handle service requests
+        List<CareplanDto> careplans = carePlanService.getCarePlansForCareTeam(episodeOfCare.getCareteamId(), episodeOfCareId);
+        careplans.forEach(careplanDto -> carePlanService.deleteCarePlan(episodeOfCareId, careplanDto.getId()));
+
+        // then delete episode of care
+        episodeOfCareService.deleteEpisodeOfCare(episodeOfCareId);
+
+        return ResponseEntity.ok().build();
     }
 }

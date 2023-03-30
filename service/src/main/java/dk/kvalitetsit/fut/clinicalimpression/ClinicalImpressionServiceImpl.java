@@ -59,4 +59,6 @@ public class ClinicalImpressionServiceImpl {
 
         return ClinicalImpressionMapper.mapClinicalImpression(clinicalImpression);
     }
+
+    //public void createClinicalImpression()
 }

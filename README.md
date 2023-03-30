@@ -1,7 +1,7 @@
 ![Build Status](https://github.com/KvalitetsIT/fut-patient-bff/workflows/CICD/badge.svg)
-# FUT Administrative Demo - BFF
+# FUT Employee Demo - BFF
 
-A small project demonstrating the use of the [eHealth Infrastructure](https://ehealth-dk.atlassian.net/wiki/spaces/EDTW/overview) for retrieving Episodes of Care, Patients, Tasks, creating consent, creating CarePlans, among other things. This is the backend for the [FUT Administrative Demo - Web](https://github.com/KvalitetsIT/fut-medarbejder-web) project.
+A small project demonstrating the use of the [eHealth Infrastructure](https://ehealth-dk.atlassian.net/wiki/spaces/EDTW/overview) for retrieving Episodes of Care, Patients, Tasks, creating consent, creating CarePlans, among other things. This is the backend for the [FUT Employee Demo - Web](https://github.com/KvalitetsIT/fut-medarbejder-web) project.
 
 ## Requirements
 - OpenJDK 17 or Docker

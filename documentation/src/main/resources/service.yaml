@@ -309,6 +309,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/tasks'
 
+  /v1/careteams/{careTeamId}/tasks/{taskId}:
+    parameters:
+      - in: path
+        name: careTeamId
+        required: true
+        schema:
+          type: string
+        description: the id corresponding to the CareTeam
+      - in: path
+        name: taskId
+        required: true
+        schema:
+          type: string
+        description: the id of the task
+    get:
+      tags:
+        - Task
+      description: Request a specific Tasks concerning the CareTeam
+      summary: get Task for CareTeam
+      operationId: v1GetTaskForCareTeam
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task'
+
   /v1/episodeofcares:
     get:
       tags:
@@ -388,6 +416,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/updateEpisodeOfCare'
+      responses:
+        '200':
+          description: Ok
+        '401':
+          $ref: '#/components/responses/401'
+    delete:
+      tags:
+        - EpisodeOfCare
+      description: Soft deletes an episode of care by id, by setting the appropriate status based on current status.
+      summary: delete episode of care
+      operationId: v1DeleteEpisodeOfCare
       responses:
         '200':
           description: Ok
@@ -589,6 +628,48 @@ paths:
           description: Ok
         '401':
           $ref: '#/components/responses/401'
+    delete:
+      tags:
+        - CarePlan
+      description: Delete a careplan.
+      summary: delete careplan
+      operationId: v1DeleteCarePlanForEpisodeOfCare
+      responses:
+        '200':
+          description: Ok
+
+  /v1/episodeofcares/{episodeOfCareId}/tasks/{taskId}:
+    parameters:
+      - in: path
+        name: episodeOfCareId
+        required: true
+        schema:
+          type: string
+        description: the id of the episode of care the task belongs to
+      - in: path
+        name: taskId
+        required: true
+        schema:
+          type: string
+        description: the id of the task
+    patch:
+      tags:
+        - Task
+      description: Update a task by id.
+      summary: update task
+      operationId: v1PatchTask
+      requestBody:
+        description: A new task.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateTask'
+      responses:
+        '200':
+          description: Ok
+        '401':
+          $ref: '#/components/responses/401'
 
   /v1/episodeofcares/{episodeOfCareId}/clinicalimpressions/{clinicalImpressionId}:
     parameters:
@@ -726,9 +807,8 @@ components:
       type: object
       properties:
         uuid:
-          description: an uuid identifying the patient
+          description: id
           type: string
-          example: "123e4567-e89b-12d3-a456-426614174000"
         status:
           description: status of episode of care
           $ref: '#/components/schemas/episodeOfCareStatus'
@@ -742,6 +822,9 @@ components:
           format: date-time
         patientId:
           description: uuid identifying the patient for this episode of care
+          type: string
+        careteamId:
+          description: id of the responsible care team for this episode of care
           type: string
         conditionCode:
           description: the code of the condition (diagnosis)
@@ -955,6 +1038,13 @@ components:
         category:
           description: category of task
           type: string
+
+    updateTask:
+      type: object
+      properties:
+        status:
+          description: status of task
+          $ref: '#/components/schemas/taskStatus'
 
     taskStatus:
       description: status of task

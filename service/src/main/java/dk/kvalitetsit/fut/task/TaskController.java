@@ -2,6 +2,8 @@ package dk.kvalitetsit.fut.task;
 
 import org.openapitools.api.TaskApi;
 import org.openapitools.model.TaskDto;
+import org.openapitools.model.TaskStatusDto;
+import org.openapitools.model.UpdateTaskDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -23,5 +25,19 @@ public class TaskController implements TaskApi {
         List<TaskDto> tasks = taskService.getTasks(careTeamId, status);
         return ResponseEntity.ok(tasks);
         //return ResponseEntity.ok(patients);
+    }
+
+    @Override
+    public ResponseEntity<TaskDto> v1GetTaskForCareTeam(String careTeamId, String taskId) {
+        TaskDto task = taskService.getTaskById(careTeamId, taskId);
+        return ResponseEntity.ok(task);
+    }
+
+    @Override
+    public ResponseEntity<Void> v1PatchTask(String episodeOfCareId, String taskId, UpdateTaskDto updateTaskDto) {
+        TaskStatusDto status = updateTaskDto.getStatus();
+        taskService.updateTask(episodeOfCareId, taskId, status);
+
+        return ResponseEntity.ok().build();
     }
 }
