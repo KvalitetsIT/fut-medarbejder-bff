@@ -74,7 +74,7 @@ public class EpisodeOfCareController implements EpisodeOfCareApi {
         EpisodeofcareDto episodeOfCare = episodeOfCareService.getEpisodeOfCare(episodeOfCareId);
 
         // first delete careplans, this will also handle service requests
-        List<CareplanDto> careplans = carePlanService.getCarePlansForCareTeam(episodeOfCare.getCareteamId(), episodeOfCareId);
+        List<CareplanDto> careplans = carePlanService.getCarePlansForCareTeam(episodeOfCare.getCareteamId(), episodeOfCareId, null);
         careplans.forEach(careplanDto -> carePlanService.deleteCarePlan(episodeOfCareId, careplanDto.getId()));
 
         // then delete episode of care

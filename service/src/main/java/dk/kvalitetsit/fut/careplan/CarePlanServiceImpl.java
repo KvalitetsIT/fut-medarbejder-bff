@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Date;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,14 +60,21 @@ public class CarePlanServiceImpl implements CarePlanService {
     }
 
     @Override
-    public List<CareplanDto> getCarePlansForCareTeam(String careTeamId, String episodeOfCareId) {
+    public List<CareplanDto> getCarePlansForCareTeam(String careTeamId, String episodeOfCareId, List<String> status) {
         String careTeamUrl = "https://organization.devenvcgi.ehealth.sundhed.dk/fhir/CareTeam/"+careTeamId;
         var careTeamCriteria = CarePlan.CARE_TEAM.hasId(careTeamUrl);
 
         String episodeOfCareUrl = "https://careplan.devenvcgi.ehealth.sundhed.dk/fhir/EpisodeOfCare/"+episodeOfCareId;
         var episodeOfCareCriteria = new ReferenceClientParam("episodeOfCare").hasId(episodeOfCareUrl);
 
-        List<CarePlan> result = lookupByCriteria(CarePlan.class, List.of(careTeamCriteria, episodeOfCareCriteria));
+        List<CarePlan> result;
+        if (status != null) {
+            var statusCriteria = CarePlan.STATUS.exactly().codes(status);
+            result = lookupByCriteria(CarePlan.class, List.of(careTeamCriteria, episodeOfCareCriteria, statusCriteria));
+        }
+        else {
+            result = lookupByCriteria(CarePlan.class, List.of(careTeamCriteria, episodeOfCareCriteria));
+        }
 
         return result.stream()
                 .map(CarePlanMapper::mapCarePlan)

@@ -12,7 +12,7 @@ public interface CarePlanService {
 
     List<CareplanDto> getCarePlansForCareTeam(String careTeamId);
 
-    List<CareplanDto> getCarePlansForCareTeam(String careTeamId, String episodeOfCareId);
+    List<CareplanDto> getCarePlansForCareTeam(String careTeamId, String episodeOfCareId, List<String> status);
 
     String createCarePlan(String episodeofcareId, String plandefinitionId);
 

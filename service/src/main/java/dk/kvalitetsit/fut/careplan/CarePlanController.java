@@ -40,8 +40,8 @@ public class CarePlanController implements CarePlanApi {
     }
 
     @Override
-    public ResponseEntity<List<CareplanDto>> v1GetCarePlansOnEpisodeOfCareForCareTeam(String careTeamId, String episodeOfCareId) {
-        List<CareplanDto> careplans = carePlanService.getCarePlansForCareTeam(careTeamId, episodeOfCareId);
+    public ResponseEntity<List<CareplanDto>> v1GetCarePlansOnEpisodeOfCareForCareTeam(String careTeamId, String episodeOfCareId, List<String> status) {
+        List<CareplanDto> careplans = carePlanService.getCarePlansForCareTeam(careTeamId, episodeOfCareId, status);
         return ResponseEntity.ok(careplans);
     }
 
