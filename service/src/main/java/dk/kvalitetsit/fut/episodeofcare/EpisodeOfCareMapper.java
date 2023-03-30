@@ -19,6 +19,7 @@ public class EpisodeOfCareMapper {
         episodeofcareDto.setEnd( toOffsetDateTime(episodeOfCare.getPeriod().getEnd()) );
         episodeofcareDto.setPatientId(episodeOfCare.getPatient().getReferenceElement().toUnqualifiedVersionless().getIdPart());
         episodeofcareDto.setConditionCode(conditionCode);
+        episodeofcareDto.setCareteamId( episodeOfCare.getTeamFirstRep().getReferenceElement().toUnqualifiedVersionless().getIdPart() );
 
         return episodeofcareDto;
     }

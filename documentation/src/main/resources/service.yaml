@@ -421,6 +421,17 @@ paths:
           description: Ok
         '401':
           $ref: '#/components/responses/401'
+    delete:
+      tags:
+        - EpisodeOfCare
+      description: Soft deletes an episode of care by id, by setting the appropriate status based on current status.
+      summary: delete episode of care
+      operationId: v1DeleteEpisodeOfCare
+      responses:
+        '200':
+          description: Ok
+        '401':
+          $ref: '#/components/responses/401'
 
 
   /v1/episodeofcares/{episodeOfCareId}/consents:
@@ -796,9 +807,8 @@ components:
       type: object
       properties:
         uuid:
-          description: an uuid identifying the patient
+          description: id
           type: string
-          example: "123e4567-e89b-12d3-a456-426614174000"
         status:
           description: status of episode of care
           $ref: '#/components/schemas/episodeOfCareStatus'
@@ -812,6 +822,9 @@ components:
           format: date-time
         patientId:
           description: uuid identifying the patient for this episode of care
+          type: string
+        careteamId:
+          description: id of the responsible care team for this episode of care
           type: string
         conditionCode:
           description: the code of the condition (diagnosis)

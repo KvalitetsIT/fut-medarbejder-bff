@@ -181,8 +181,8 @@ public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
             patchOperations.add(String.format(replaceOperation, "/period/start", newStart.asStringValue()));
         }
         if (end != null) {
-            DateTimeType newEnd = new DateTimeType(Date.from(end.toInstant()));
-            patchOperations.add(String.format(replaceOperation, "/period/end", newEnd.asStringValue()));
+//            DateTimeType newEnd = new DateTimeType(Date.from(end.toInstant()));
+//            patchOperations.add(String.format(replaceOperation, "/period/end", newEnd.asStringValue()));
         }
         if (status != null) {
             EpisodeOfCare.EpisodeOfCareStatus newStatus = EpisodeOfCareMapper.mapEpisodeOfCareStatus(status);
@@ -194,7 +194,7 @@ public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
         String patchBody = "[" + Strings.join(patchOperations, ',') + "]";
 
 
-        logger.debug(String.format("Patching EpisodeOfCare id=%s with json patch body:\n%s", episodeOfCareId, patchBody));
+        logger.info(String.format("Patching EpisodeOfCare id=%s with json patch body:\n%s", episodeOfCareId, patchBody));
 
         String episodeOfCareUrl = "https://careplan.devenvcgi.ehealth.sundhed.dk/fhir/EpisodeOfCare/"+ episodeOfCareId;
         IGenericClient client = getFhirClientWithEpisodeOfCareContext(episodeOfCareUrl);
@@ -208,6 +208,12 @@ public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
         //EpisodeOfCare resultingResource = (EpisodeOfCare) outcome.getResource();
 
         logger.info(String.format("Updated EpisodeOfCare with id: %s", outcome.getId().toUnqualifiedVersionless().getIdPart()));
+    }
+
+    @Override
+    public void deleteEpisodeOfCare(String episodeOfCareId) {
+        EpisodeofcareDto episodeOfCare = this.getEpisodeOfCare(episodeOfCareId);
+        updateEpisodeOfCare(episodeOfCareId, episodeOfCare.getStart(), OffsetDateTime.now(), EpisodeOfCareStatusDto.ENTERED_IN_ERROR, null);
     }
 
     private <T extends Resource> List<T> lookupByCriteria(Class<T> resourceClass, List<ICriterion> criteria) {
