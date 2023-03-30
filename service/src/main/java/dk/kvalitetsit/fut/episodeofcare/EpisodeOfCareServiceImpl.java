@@ -36,10 +36,17 @@ public class EpisodeOfCareServiceImpl implements EpisodeOfCareService {
     }
 
     @Override
-    public List<EpisodeofcareDto> getEpisodeOfCaresForCareTeam(String careTeamId) {
+    public List<EpisodeofcareDto> getEpisodeOfCaresForCareTeam(String careTeamId, List<String> status) {
         var teamCriteria = new ReferenceClientParam("team").hasId("https://organization.devenvcgi.ehealth.sundhed.dk/fhir/CareTeam/" + careTeamId);
 
-        List<EpisodeOfCare> result = lookupByCriteria(EpisodeOfCare.class, List.of(teamCriteria));
+        List<EpisodeOfCare> result;
+        if (status != null) {
+            var statusCriteria = CarePlan.STATUS.exactly().codes(status);
+            result = lookupByCriteria(EpisodeOfCare.class, List.of(teamCriteria, statusCriteria));
+        }
+        else {
+            result = lookupByCriteria(EpisodeOfCare.class, List.of(teamCriteria));
+        }
 
         return result.stream()
                 .map(episodeOfCare -> EpisodeOfCareMapper.mapEpisodeOfCare(episodeOfCare, ""))

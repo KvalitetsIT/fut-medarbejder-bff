@@ -359,6 +359,14 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: status
+          description: status of episode of care
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
       responses:
         '200':
           description: Ok

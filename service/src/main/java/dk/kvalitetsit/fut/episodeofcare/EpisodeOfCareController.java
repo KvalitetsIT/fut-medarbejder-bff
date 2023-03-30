@@ -29,7 +29,7 @@ public class EpisodeOfCareController implements EpisodeOfCareApi {
 
     @Override
     public ResponseEntity<List<EpisodeofcareDto>> v1GetEpisodeOfCaresForCareTeam(String careTeamId) {
-        List<EpisodeofcareDto> patients = episodeOfCareService.getEpisodeOfCaresForCareTeam(careTeamId);
+        List<EpisodeofcareDto> patients = episodeOfCareService.getEpisodeOfCaresForCareTeam(careTeamId, null);
         return ResponseEntity.ok(patients);
     }
 
@@ -41,8 +41,8 @@ public class EpisodeOfCareController implements EpisodeOfCareApi {
     }
 
     @Override
-    public ResponseEntity<List<EpisodeofcareDto>> v1GetEpisodeOfCares(String careTeamId) {
-        List<EpisodeofcareDto> patients = episodeOfCareService.getEpisodeOfCaresForCareTeam(careTeamId);
+    public ResponseEntity<List<EpisodeofcareDto>> v1GetEpisodeOfCares(String careTeamId, List<String> status) {
+        List<EpisodeofcareDto> patients = episodeOfCareService.getEpisodeOfCaresForCareTeam(careTeamId, status);
         return ResponseEntity.ok(patients);
     }
 

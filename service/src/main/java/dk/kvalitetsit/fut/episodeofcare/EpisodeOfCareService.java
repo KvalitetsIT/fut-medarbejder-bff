@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 public interface EpisodeOfCareService {
-    List<EpisodeofcareDto> getEpisodeOfCaresForCareTeam(String careTeamId);
+    List<EpisodeofcareDto> getEpisodeOfCaresForCareTeam(String careTeamId, List<String> status);
     String createEpisodeOfCare(String careTeamId, String patientId, CreateEpisodeOfCareDto.ProvenanceEnum provenance, List<String> conditionCodes);
 
     EpisodeofcareDto getEpisodeOfCare(String episodeOfCareId);
