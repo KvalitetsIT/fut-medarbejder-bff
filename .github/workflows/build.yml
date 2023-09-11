@@ -18,7 +18,7 @@ jobs:
         echo "DOCKER_DOCUMENTATION=kvalitetsit/fut-medarbejder-bff-documentation" >> $GITHUB_ENV
 
 # Checkout source code
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
 # Fail if DOCKER_SERVICE is fut-medarbejder-bff and repo is not fut-medarbejder-bff. This step can be deleted once
     - name: Initial build
